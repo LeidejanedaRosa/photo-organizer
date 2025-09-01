@@ -1,7 +1,7 @@
 """
 Módulo para configurações personalizáveis do organizador de fotos.
 """
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 
@@ -99,6 +99,51 @@ class ProjectConfiguration:
         
         return True
     
+    def should_create_new_period(self, data: datetime) -> bool:
+        """
+        Verifica se deve criar um novo período para esta data.
+        Retorna True se a data está após o período atual.
+        """
+        if self.data_final and data > self.data_final:
+            return True
+        return False
+    
+    def suggest_new_period_config(
+        self,
+        data: datetime
+    ) -> 'ProjectConfiguration':
+        """
+        Sugere uma nova configuração para período subsequente.
+        Mantém o mesmo prefixo e configurações, mas com novas datas.
+        """
+        if not self.data_final:
+            raise ValueError(
+                "Não é possível sugerir novo período sem data final definida"
+            )
+        
+        # Nova data de início = dia seguinte à data final anterior
+        nova_data_inicio = self.data_final + timedelta(days=1)
+        
+        # Nova data final = +1 ano da nova data início
+        try:
+            nova_data_final = (
+                nova_data_inicio.replace(year=nova_data_inicio.year + 1) -
+                timedelta(days=1)
+            )
+        except ValueError:
+            # Caso especial 29/02
+            nova_data_final = datetime(nova_data_inicio.year + 1, 2, 28)
+        
+        return ProjectConfiguration(
+            data_inicio=nova_data_inicio,
+            data_final=nova_data_final,
+            prefixo_nomenclatura=self.prefixo_nomenclatura,
+            separador=self.separador,
+            incluir_periodo=self.incluir_periodo,
+            incluir_sequencial=self.incluir_sequencial,
+            formato_data=self.formato_data
+        )
+    
     def generate_filename_pattern(self, data: datetime, sequencial: int = 0, evento: Optional[str] = None) -> str:
         """
         Gera o padrão de nomenclatura baseado na configuração.
@@ -147,10 +192,15 @@ class ConfigurationManager:
         """
         Cria uma configuração compatível com o sistema anterior (bebê).
         Mantém compatibilidade com nomenclatura existente.
+        Data final automática: +1 ano da data inicial.
         """
+        data_inicio = datetime(2024, 8, 17)
+        data_final = datetime(2025, 8, 16)  # Exatamente 1 ano depois
+        
         return ProjectConfiguration(
-            data_inicio=datetime(2024, 8, 17),
-            prefixo_nomenclatura="IMG",
+            data_inicio=data_inicio,
+            data_final=data_final,
+            prefixo_nomenclatura="MA 19a",
             separador=" - ",
             incluir_periodo=True,
             incluir_sequencial=True,
@@ -166,7 +216,28 @@ class ConfigurationManager:
     ) -> ProjectConfiguration:
         """
         Cria uma configuração personalizada.
+        Se data_final não fornecida, define automaticamente +1 ano.
         """
+        # Se não fornecer data final, define automaticamente como +1 ano
+        if data_final is None:
+            if data_inicio.month == 2 and data_inicio.day == 29:
+                # Caso especial: 29/02 -> 28/02 do ano seguinte
+                data_final = datetime(data_inicio.year + 1, 2, 28)
+            else:
+                try:
+                    data_final = datetime(
+                        data_inicio.year + 1,
+                        data_inicio.month,
+                        data_inicio.day - 1  # Um dia antes para completar exato 1 ano
+                    )
+                except ValueError:
+                    # Caso especial: 31 de mês que não tem 31 dias
+                    data_final = datetime(
+                        data_inicio.year + 1,
+                        data_inicio.month,
+                        28
+                    )
+        
         return ProjectConfiguration(
             data_inicio=data_inicio,
             data_final=data_final,
@@ -196,22 +267,47 @@ class ConfigurationManager:
                 print("❌ Data inválida. Use o formato DD/MM/AAAA")
         
         # Data final (opcional)
+        data_final_sugerida = data_inicio.replace(year=data_inicio.year + 1)
+        data_final_sugerida = data_final_sugerida - timedelta(days=1)
+        print(f"\n📅 Data final sugerida: "
+              f"{data_final_sugerida.strftime('%d/%m/%Y')} (exato 1 ano)")
+        
+        data_final_input = input(
+            "📅 Data final personalizada (DD/MM/AAAA) "
+            "[Enter para usar sugerida]: "
+        ).strip()
+        
         data_final = None
-        data_final_input = input("📅 Data final (DD/MM/AAAA) [opcional, Enter para pular]: ").strip()
         if data_final_input:
             try:
                 data_final = datetime.strptime(data_final_input, "%d/%m/%Y")
+                print(f"✅ Data final definida: "
+                      f"{data_final.strftime('%d/%m/%Y')}")
             except ValueError:
-                print("⚠️  Data final inválida, será ignorada")
+                print("⚠️  Data final inválida, usando data sugerida")
+        
+        if not data_final:
+            # Calcula automaticamente +1 ano
+            try:
+                data_final = (
+                    data_inicio.replace(year=data_inicio.year + 1) -
+                    timedelta(days=1)
+                )
+            except ValueError:
+                # Caso especial 29/02
+                data_final = datetime(data_inicio.year + 1, 2, 28)
+            print(f"✅ Data final automática: "
+                  f"{data_final.strftime('%d/%m/%Y')}")
         
         # Prefixo da nomenclatura
-        prefixo = input("🏷️  Prefixo da nomenclatura (ex: 'IMG', 'FOTO'): ").strip()
-        if not prefixo:
-            prefixo = "IMG"
+        prefixo_input = input(
+            "\n🏷️  Prefixo da nomenclatura [Enter para 'IMG']: "
+        ).strip()
+        prefixo = prefixo_input if prefixo_input else "IMG"
         
         # Incluir cálculo de período
         print("\n📊 NUMERAÇÃO SEQUENCIAL:")
-        print("   ✅ COM números: 00-FOTO-data, 01-FOTO-data (ordem cronológica)")
+        print("   ✅ COM números: 00-FOTO-data, 01-FOTO-data (cronológica)")
         print("   ❌ SEM números: FOTO-data (ordem alfabética quebrada)")
         incluir_periodo_input = input(
             "📊 Incluir numeração sequencial? (S/n): "
