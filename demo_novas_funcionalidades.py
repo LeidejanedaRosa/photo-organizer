@@ -50,28 +50,32 @@ def demo_configuracoes():
     
     print()
     
-    # 2. Configuração compatível (sistema anterior)
-    print("2️⃣  SISTEMA COMPATÍVEL (BEBÊ)")
+    # 2. Configuração personalizada
+    print("2️⃣  SISTEMA PERSONALIZADO")
     print("-" * 30)
-    config_bebe = ConfigurationManager.create_baby_configuration()
+    config_personalizada = ConfigurationManager.create_custom_configuration(
+        data_inicio=datetime(2024, 1, 1),
+        prefixo="IMG",
+        incluir_periodo=True
+    )
     
-    datas_bebe = [
-        datetime(2024, 8, 17),  # Nascimento
-        datetime(2024, 10, 15), # Mês 02
-        datetime(2025, 1, 20),  # Mês 05
+    datas_personalizadas = [
+        datetime(2024, 1, 15),  # Início
+        datetime(2024, 3, 10),  # Meio 
+        datetime(2024, 6, 20),  # Meio do ano
     ]
     
-    generator_bebe = FilenameGenerator(config_bebe)
+    generator_personalizada = FilenameGenerator(config_personalizada)
     
-    for i, data in enumerate(datas_bebe):
+    for i, data in enumerate(datas_personalizadas):
         img = type('MockImage', (), {
             'data_preferencial': data,
             'extensao': '.jpg'
         })()
         
-        nome = generator_bebe.generate_filename(img, i)
-        periodo = config_bebe.calculate_period_number(data)
-        print(f"👶 {data.strftime('%d/%m/%Y')} -> Período {periodo:02d} -> {nome}")
+        nome = generator_personalizada.generate_filename(img, i)
+        periodo = config_personalizada.calculate_period_number(data)
+        print(f"� {data.strftime('%d/%m/%Y')} -> Período {periodo:02d} -> {nome}")
     
     print()
     
@@ -92,10 +96,9 @@ def demo_configuracoes():
         'extensao': '.png'
     })()
     
-    nome = generator_simples.generate_filename(img, 0, {"15032023": "Aniversário"})
-    print(f"📸 {data_simples.strftime('%d/%m/%Y')} -> {nome}")
-
-
+    print("✅ Demonstração das configurações concluída")
+    
+    
 def demo_flexibilidade():
     """Demonstra a flexibilidade do novo sistema."""
     print("\n🔧 DEMONSTRAÇÃO - FLEXIBILIDADE DO SISTEMA")
@@ -165,7 +168,7 @@ def demo_comparacao():
     nome_antigo = generator_antigo.generate_filename(img, 1)
     print(f"   🏷️  {nome_antigo}")
     print("   📝 Características:")
-    print("   ✓ Baseado em data fixa (17/08/2024)")
+    print("   ✓ Baseado em data fixa (01/01/2025)")
     print("   ✓ Prefixo fixo (IMG)")
     print("   ✓ Cálculo específico de mês do bebê")
     

@@ -1,6 +1,6 @@
 from typing import List
 
-from ..domain.image import ImageInfo, BabyAge, PeriodCalculator
+from ..domain.image import ImageInfo, PeriodCalculator
 from ..domain.configuration import ProjectConfiguration, ConfigurationManager
 from ..services.photo_organizer_service import PhotoOrganizerService
 from ..utils.event_manager import EventManager
@@ -144,10 +144,8 @@ class PhotoOrganizerCLI:
             print("─" * 50)
             for img in fotos_periodo:
                 data = img.data_preferencial
-                mes_bebe = BabyAge.calculate_month(data)
                 print(f"📷 {img.arquivo}")
                 print(f"   📅 Data: {data.strftime('%d/%m/%Y %H:%M')}")
-                print(f"   👶 Mês do bebê: {mes_bebe:02d}")
                 print(f"   📏 Dimensões: {img.dimensoes}")
                 print()
         else:
@@ -178,7 +176,7 @@ class PhotoOrganizerCLI:
             self.service.organize_by_years(imagens, diretorio, simular=False)
         elif not anos_dict:
             print("📅 Nenhuma imagem com data válida para organização por anos.")
-            print("💡 As imagens devem ter datas a partir de 17/08/2024.")
+            print("💡 As imagens devem ter datas a partir de 01/01/2025.")
     
     def _opcao_organizar_periodos_customizados(
         self, 
@@ -227,22 +225,18 @@ class PhotoOrganizerCLI:
         
         opcoes = [
             "1️⃣  Configurar novo projeto personalizado",
-            "2️⃣  Usar configuração compatível (sistema anterior)",
-            "3️⃣  Visualizar configuração atual"
+            "2️⃣  Visualizar configuração atual"
         ]
         
         for opcao in opcoes:
             print(f"   {opcao}")
         
-        escolha = input("\n🔢 Escolha uma opção (1-3): ").strip()
+        escolha = input("\n🔢 Escolha uma opção (1-2): ").strip()
         
         if escolha == "1":
             self.configuration = ConfigurationManager.prompt_user_configuration()
             print("✅ Configuração personalizada aplicada!")
         elif escolha == "2":
-            self.configuration = ConfigurationManager.create_baby_configuration()
-            print("✅ Configuração compatível aplicada!")
-        elif escolha == "3":
             self._exibir_configuracao_atual()
         else:
             print("❌ Opção inválida!")

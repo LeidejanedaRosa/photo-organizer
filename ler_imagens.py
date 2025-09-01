@@ -11,34 +11,6 @@ from pathlib import Path
 from collections import defaultdict
 
 
-def calcular_ano_bebe(data: datetime) -> int:
-    """
-    Calcula qual ano do bebê baseado na data da foto.
-    Ano 1: 17/08/2024 a 16/08/2025
-    Ano 2: 17/08/2025 a 16/08/2026
-    E assim por diante...
-    """
-    # Data de nascimento base: 17/08/2024
-    data_nascimento = datetime(2024, 8, 17)
-    
-    # Se a foto é antes do nascimento, retorna 0 (inválido)
-    if data < data_nascimento:
-        return 0
-    
-    # Calcula a diferença em anos
-    anos_passados = data.year - data_nascimento.year
-    
-    # Verifica se já passou o aniversário no ano atual
-    aniversario_atual = datetime(data.year, 8, 17)
-    
-    if data >= aniversario_atual:
-        # Já passou o aniversário este ano
-        return anos_passados + 1
-    else:
-        # Ainda não chegou o aniversário este ano
-        return anos_passados
-
-
 class InfoImagem(NamedTuple):
     arquivo: str
     formato: str | None  # Formato pode ser None para alguns tipos de arquivo
@@ -807,7 +779,7 @@ def exibir_menu_inicial():
     print("🎯 FORMATO DE NOMENCLATURA:")
     print("   📅 MM - IMG DDMMAAAA(XX) [- evento]")
     print("   📝 Onde: MM=mês do bebê, DD/MM/AAAA=data, XX=sequencial")
-    print("   🗓️ Organização automática por anos a partir de 17/08/2024")
+    print("   🗓️ Organização automática por anos a partir de 01/01/2025")
     print()
     print("=" * 70)
     
@@ -826,19 +798,15 @@ def exibir_menu_inicial():
 def solicitar_diretorio():
     """Solicita o diretório das fotos."""
     print("\n📁 CONFIGURAÇÃO DO DIRETÓRIO:")
-    print("   Por padrão: '../../../Área de trabalho/Celular'")
     
-    usar_padrao = input("\n📂 Usar diretório padrão? (S/n): ").strip().lower()
-    
-    if usar_padrao in ['', 's', 'sim', 'y', 'yes']:
-        return "../../../Área de trabalho/Celular"
-    else:
-        while True:
-            caminho = input("📁 Digite o caminho do diretório: ").strip()
-            if os.path.exists(caminho):
-                return caminho
-            else:
-                print("❌ Diretório não encontrado! Tente novamente.")
+    while True:
+        caminho = input("📁 Digite o caminho do diretório: ").strip()
+        if caminho and os.path.exists(caminho):
+            return caminho
+        elif not caminho:
+            print("❌ Por favor, digite um caminho válido!")
+        else:
+            print("❌ Diretório não encontrado! Tente novamente.")
 
 
 def executar_opcao(opcao: int, diretorio: str):
@@ -963,7 +931,7 @@ def executar_opcao(opcao: int, diretorio: str):
                 print(f"   📅 Ano {ano}: {len(imagens_por_ano[ano])} imagem(ns)")
                 # Mostra período do ano
                 if ano == 1:
-                    print("       📆 Período: 17/08/2024 a 16/08/2025")
+                    print("       📆 Período: 01/01/2025 a 31/12/2025")
                 else:
                     inicio = 2024 + (ano - 1)
                     fim = inicio + 1
@@ -981,7 +949,7 @@ def executar_opcao(opcao: int, diretorio: str):
                 organizar_por_anos_automatico(imagens_com_data, diretorio, simular=False)
         else:
             print("📅 Nenhuma imagem com data válida para organização por anos.")
-            print("💡 As imagens devem ter datas a partir de 17/08/2024.")
+            print("💡 As imagens devem ter datas a partir de 01/01/2025.")
             
     elif opcao == 9:
         print("💾 CRIANDO BACKUP DO ESTADO ATUAL...")

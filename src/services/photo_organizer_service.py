@@ -173,11 +173,9 @@ class PhotoOrganizerService:
     
     def _print_image_details(self, imagens: List[ImageInfo]) -> None:
         """Imprime detalhes das imagens."""
-        from ..domain.image import BabyAge
         
         for img in imagens:
             data = img.data_preferencial
-            mes_bebe = BabyAge.calculate_month(data)
             
             print(f"Arquivo: {img.arquivo}")
             print(f"Formato: {img.formato}")
@@ -189,5 +187,4 @@ class PhotoOrganizerService:
             if img.data_exif:
                 print(f"Data EXIF: "
                       f"{img.data_exif.strftime('%d/%m/%Y %H:%M:%S')}")
-            print(f"Mês do bebê: {mes_bebe:02d}")
             print("-" * 40)

@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 from collections import defaultdict
 
-from ..domain.image import ImageInfo, BabyAge, Event
+from ..domain.image import ImageInfo, Event
 from ..domain.configuration import ProjectConfiguration, ConfigurationManager
 
 
@@ -15,11 +15,16 @@ class FilenameGenerator:
     def __init__(self, configuration: Optional[ProjectConfiguration] = None):
         """
         Inicializa com uma configuração específica.
-        Se não fornecida, usa configuração padrão compatível.
+        Se não fornecida, usa configuração padrão.
         """
-        self.configuration = (
-            configuration or ConfigurationManager.create_baby_configuration()
-        )
+        if configuration is None:
+            from datetime import datetime
+            configuration = ConfigurationManager.create_custom_configuration(
+                data_inicio=datetime.now().replace(month=1, day=1),
+                prefixo="IMG",
+                incluir_periodo=True
+            )
+        self.configuration = configuration
     
     def generate_filename(
         self,
@@ -68,31 +73,6 @@ class FilenameGenerator:
             bool(re.match(padrao_antigo, nome_sem_ext)) or
             bool(re.match(padrao_novo, nome_sem_ext))
         )
-    
-    def generate_filename_legacy(
-        self,
-        info: ImageInfo,
-        numero_sequencial: int = 0,
-        eventos: Optional[Dict[str, str]] = None
-    ) -> str:
-        """
-        Mantém compatibilidade com sistema anterior (formato bebê).
-        """
-        data = info.data_preferencial
-        mes_bebe = BabyAge.calculate_month(data)
-        
-        novo_nome = (
-            f"{mes_bebe:02d} - IMG "
-            f"{data.strftime('%d%m%Y')}"
-            f"({numero_sequencial:02d})"
-        )
-        
-        if eventos:
-            data_fmt = data.strftime('%d%m%Y')
-            if data_fmt in eventos:
-                novo_nome = f"{novo_nome} - {eventos[data_fmt]}"
-        
-        return novo_nome + info.extensao
 
 
 class FileRenamer:

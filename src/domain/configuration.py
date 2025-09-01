@@ -188,26 +188,6 @@ class ConfigurationManager:
     """Gerenciador de configurações do projeto."""
     
     @staticmethod
-    def create_baby_configuration() -> ProjectConfiguration:
-        """
-        Cria uma configuração compatível com o sistema anterior (bebê).
-        Mantém compatibilidade com nomenclatura existente.
-        Data final automática: +1 ano da data inicial.
-        """
-        data_inicio = datetime(2024, 8, 17)
-        data_final = datetime(2025, 8, 16)  # Exatamente 1 ano depois
-        
-        return ProjectConfiguration(
-            data_inicio=data_inicio,
-            data_final=data_final,
-            prefixo_nomenclatura="MA 19a",
-            separador=" - ",
-            incluir_periodo=True,
-            incluir_sequencial=True,
-            formato_data="%d%m%Y"
-        )
-    
-    @staticmethod
     def create_custom_configuration(
         data_inicio: datetime,
         data_final: Optional[datetime] = None,
@@ -228,7 +208,7 @@ class ConfigurationManager:
                     data_final = datetime(
                         data_inicio.year + 1,
                         data_inicio.month,
-                        data_inicio.day - 1  # Um dia antes para completar exato 1 ano
+                        data_inicio.day - 1  # Um dia antes (exato 1 ano)
                     )
                 except ValueError:
                     # Caso especial: 31 de mês que não tem 31 dias

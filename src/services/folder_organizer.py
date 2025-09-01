@@ -4,7 +4,7 @@ from typing import Dict, List, Optional
 from collections import defaultdict
 from pathlib import Path
 
-from ..domain.image import ImageInfo, BabyAge
+from ..domain.image import ImageInfo
 from ..domain.configuration import ProjectConfiguration
 
 
@@ -18,7 +18,7 @@ class FolderOrganizer:
         simular: bool = True
     ) -> Dict[int, List[ImageInfo]]:
         """
-        Organiza imagens automaticamente por ano do bebê.
+        Organiza imagens automaticamente por ano.
         
         Returns:
             Dicionário com ano -> lista de imagens
@@ -30,18 +30,17 @@ class FolderOrganizer:
         
         for img in imagens:
             data = img.data_preferencial
-            ano_bebe = BabyAge.calculate_year(data)
-            if ano_bebe > 0:
-                imagens_por_ano[ano_bebe].append(img)
+            ano = data.year
+            imagens_por_ano[ano].append(img)
         
         if not imagens_por_ano:
             print("📅 Nenhuma imagem com data válida para organização.")
             return {}
         
         if simular:
-            print("\n🔄 SIMULAÇÃO: Organizando por anos do bebê...")
+            print("\n🔄 SIMULAÇÃO: Organizando por anos...")
         else:
-            print("\n📅 ORGANIZANDO POR ANOS DO BEBÊ...")
+            print("\n📅 ORGANIZANDO POR ANOS...")
         
         print("─" * 70)
         
@@ -50,7 +49,7 @@ class FolderOrganizer:
         for ano, imgs_do_ano in sorted(imagens_por_ano.items()):
             pasta_ano = os.path.join(diretorio, f"Ano {ano}")
             
-            print(f"\n📂 Ano {ano} do bebê")
+            print(f"\n📂 Ano {ano}")
             print(f"   📊 {len(imgs_do_ano)} imagem(ns) encontrada(s)")
             
             if simular:

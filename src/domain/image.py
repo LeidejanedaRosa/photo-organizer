@@ -94,36 +94,6 @@ class PeriodCalculator:
             return meses_diff - 1 if meses_diff > 0 else 0
 
 
-# Mantém compatibilidade com código existente
-class BabyAge:
-    """Compatibilidade com sistema anterior - calcula idade do bebê."""
-    
-    BIRTH_DATE = datetime(2024, 8, 17)
-    
-    @classmethod
-    def calculate_year(cls, data: datetime) -> int:
-        """Mantém compatibilidade - calcula ano do bebê."""
-        calculator = PeriodCalculator(cls.BIRTH_DATE)
-        return calculator.calculate_year(data)
-    
-    @classmethod
-    def calculate_month(cls, data: datetime) -> int:
-        """Mantém compatibilidade - calcula mês do bebê com lógica original."""
-        mes = data.month
-        dia = data.day
-        
-        if mes == 8:
-            if dia >= 17:
-                return 0  # Mês 00
-            else:
-                return 12  # Mês 12
-        
-        if mes >= 9:  # Setembro a dezembro
-            return mes - 8
-        else:  # Janeiro a julho
-            return mes + 4
-
-
 class Event:
     """Representa um evento associado a uma data."""
     

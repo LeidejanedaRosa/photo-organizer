@@ -7,11 +7,11 @@ from datetime import datetime
 def calcular_ano_bebe(data: datetime) -> int:
     """
     Calcula qual ano do bebê baseado na data da foto.
-    Ano 1: 17/08/2024 a 16/08/2025
+    Ano 1: 01/01/2025 a 31/12/2025
     Ano 2: 17/08/2025 a 16/08/2026
     E assim por diante...
     """
-    # Data de nascimento base: 17/08/2024
+    # Data de nascimento base: 01/01/2025
     data_nascimento = datetime(2024, 8, 17)
     
     # Se a foto é antes do nascimento, retorna 0 (inválido)

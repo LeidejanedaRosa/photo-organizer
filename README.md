@@ -86,7 +86,7 @@ Exemplos:
 
 2. **Usar configuração compatível**
    - Mantém sistema anterior (IMG)
-   - Data base: 17/08/2024
+   - Data base: 01/01/2025
 
 3. **Visualizar configuração atual**
    - Mostra parâmetros ativos
@@ -114,8 +114,8 @@ Exemplos:
 - **Flexibilidade**: Qualquer data de referência
 
 ### Sistema Legado (Compatibilidade):
-- **Data de nascimento**: 17/08/2024
-- **Ano 1**: 17/08/2024 a 16/08/2025
+- **Data de nascimento**: 01/01/2025
+- **Ano 1**: 01/01/2025 a 31/12/2025
 - **Ano 2**: 17/08/2025 a 16/08/2026
 
 ## 🔧 Funcionalidades
@@ -253,8 +253,8 @@ service.generate_report(imagens_nao_org + imagens_org)
 
 ## 🗓️ Cálculo da Idade do Bebê
 
-- **Data de nascimento**: 17/08/2024
-- **Ano 1**: 17/08/2024 a 16/08/2025
+- **Data de nascimento**: 01/01/2025
+- **Ano 1**: 01/01/2025 a 31/12/2025
 - **Ano 2**: 17/08/2025 a 16/08/2026
 - E assim por diante...
 

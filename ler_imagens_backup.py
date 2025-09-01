@@ -72,7 +72,7 @@ def criar_backup_operacao(diretorio: str, operacao: str) -> str:
                 print(f"   📅 Ano {ano}: {len(imagens_por_ano[ano])} imagem(ns)")
                 # Mostra período do ano
                 if ano == 1:
-                    print("       📆 Período: 17/08/2024 a 16/08/2025")
+                    print("       📆 Período: 01/01/2025 a 31/12/2025")
                 elif ano == 2:
                     print("       📆 Período: 17/08/2025 a 16/08/2026")
                 else:
@@ -92,7 +92,7 @@ def criar_backup_operacao(diretorio: str, operacao: str) -> str:
                 organizar_por_anos_automatico(imagens_todas, diretorio, simular=False)
         else:
             print("📅 Nenhuma imagem com data válida para organização por anos.")
-            print("💡 As imagens devem ter datas a partir de 17/08/2024.")
+            print("💡 As imagens devem ter datas a partir de 01/01/2025.")
             
     elif opcao == 9:
         print("💾 CRIANDO BACKUP DO ESTADO ATUAL...")
@@ -420,11 +420,11 @@ def calcular_mes_bebe(data: datetime) -> int:
 def calcular_ano_bebe(data: datetime) -> int:
     """
     Calcula qual ano do bebê baseado na data da foto.
-    Ano 1: 17/08/2024 a 16/08/2025
+    Ano 1: 01/01/2025 a 31/12/2025
     Ano 2: 17/08/2025 a 16/08/2026
     E assim por diante...
     """
-    # Data de nascimento base: 17/08/2024
+    # Data de nascimento base: 01/01/2025
     data_nascimento = datetime(2024, 8, 17)
     
     # Se a foto é antes do nascimento, retorna 0 (inválido)
@@ -870,7 +870,7 @@ def exibir_menu_inicial():
     print("🎯 FORMATO DE NOMENCLATURA:")
     print("   📅 MM - IMG DDMMAAAA(XX) [- evento]")
     print("   📝 Onde: MM=mês do bebê, DD/MM/AAAA=data, XX=sequencial")
-    print("   🗓️ Organização automática por anos a partir de 17/08/2024")
+    print("   🗓️ Organização automática por anos a partir de 01/01/2025")
     print()
     print("=" * 70)
     
@@ -889,19 +889,15 @@ def exibir_menu_inicial():
 def solicitar_diretorio():
     """Solicita o diretório das fotos."""
     print("\n📁 CONFIGURAÇÃO DO DIRETÓRIO:")
-    print("   Por padrão: '../../../Área de trabalho/Celular'")
     
-    usar_padrao = input("\n📂 Usar diretório padrão? (S/n): ").strip().lower()
-    
-    if usar_padrao in ['', 's', 'sim', 'y', 'yes']:
-        return "../../../Área de trabalho/Celular"
-    else:
-        while True:
-            caminho = input("📁 Digite o caminho do diretório: ").strip()
-            if os.path.exists(caminho):
-                return caminho
-            else:
-                print("❌ Diretório não encontrado! Tente novamente.")
+    while True:
+        caminho = input("📁 Digite o caminho do diretório: ").strip()
+        if caminho and os.path.exists(caminho):
+            return caminho
+        elif not caminho:
+            print("❌ Por favor, digite um caminho válido!")
+        else:
+            print("❌ Diretório não encontrado! Tente novamente.")
 
 
 def executar_opcao(opcao: int, diretorio: str):

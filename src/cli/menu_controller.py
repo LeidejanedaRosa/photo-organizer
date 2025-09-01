@@ -45,21 +45,15 @@ class MenuController:
     def solicitar_diretorio() -> str:
         """Solicita o diretório das fotos."""
         print("\n📁 CONFIGURAÇÃO DO DIRETÓRIO:")
-        print("   Por padrão: '../../../Área de trabalho/Celular'")
         
-        usar_padrao = input(
-            "\n📂 Usar diretório padrão? (S/n): "
-        ).strip().lower()
-        
-        if usar_padrao in ['', 's', 'sim', 'y', 'yes']:
-            return "../../../Área de trabalho/Celular"
-        else:
-            while True:
-                caminho = input("📁 Digite o caminho do diretório: ").strip()
-                if os.path.exists(caminho):
-                    return caminho
-                else:
-                    print("❌ Diretório não encontrado! Tente novamente.")
+        while True:
+            caminho = input("📁 Digite o caminho do diretório: ").strip()
+            if caminho and os.path.exists(caminho):
+                return caminho
+            elif not caminho:
+                print("❌ Por favor, digite um caminho válido!")
+            else:
+                print("❌ Diretório não encontrado! Tente novamente.")
     
     @staticmethod
     def confirmar_operacao(mensagem: str) -> bool:

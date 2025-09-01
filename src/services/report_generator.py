@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List
 from collections import defaultdict
 
-from ..domain.image import ImageInfo, BabyAge
+from ..domain.image import ImageInfo
 
 
 class ReportGenerator:
@@ -24,7 +24,6 @@ class ReportGenerator:
         
         # Análises específicas
         self._analyze_formats(imagens, total_imagens)
-        self._analyze_baby_months(imagens, total_imagens)
         self._analyze_dimensions(imagens, total_imagens)
         self._analyze_temporal_data(imagens, total_imagens, total_tamanho)
         
@@ -47,21 +46,6 @@ class ReportGenerator:
                 f"   📄 {formato}: {count} arquivos ({porcentagem:.1f}%) - "
                 f"{tamanho_mb:.2f} MB"
             )
-    
-    def _analyze_baby_months(self, imagens: List[ImageInfo], total: int) -> None:
-        """Analisa distribuição por mês do bebê."""
-        meses_bebe = defaultdict(int)
-        
-        for img in imagens:
-            data = img.data_preferencial
-            mes = BabyAge.calculate_month(data)
-            meses_bebe[mes] += 1
-        
-        print("\n📅 DISTRIBUIÇÃO POR MÊS DO BEBÊ:")
-        for mes in sorted(meses_bebe.keys()):
-            count = meses_bebe[mes]
-            porcentagem = (count / total) * 100
-            print(f"   🗓️  Mês {mes:02d}: {count} fotos ({porcentagem:.1f}%)")
     
     def _analyze_dimensions(self, imagens: List[ImageInfo], total: int) -> None:
         """Analisa distribuição por dimensões."""
