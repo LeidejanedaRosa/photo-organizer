@@ -1,6 +1,7 @@
 from typing import List
 
-from ..domain.image import ImageInfo, BabyAge
+from ..domain.image import ImageInfo, BabyAge, PeriodCalculator
+from ..domain.configuration import ProjectConfiguration, ConfigurationManager
 from ..services.photo_organizer_service import PhotoOrganizerService
 from ..utils.event_manager import EventManager
 from .menu_controller import MenuController
@@ -15,6 +16,7 @@ class PhotoOrganizerCLI:
     def __init__(self):
         self.service = PhotoOrganizerService()
         self.menu = MenuController()
+        self.configuration = None  # Será definida pelo usuário
     
     def run(self) -> None:
         """Executa a aplicação CLI."""
@@ -32,6 +34,11 @@ class PhotoOrganizerCLI:
         """Executa a opção escolhida pelo usuário."""
         self.menu.imprimir_separador()
         
+        # Para opção 9, configura primeiro
+        if opcao == 9:
+            self._opcao_configuracao_personalizada()
+            return
+        
         # Análise inicial do diretório
         imagens_nao_org, imagens_org = self.service.analyze_directory(diretorio)
         todas_imagens = imagens_nao_org + imagens_org
@@ -41,7 +48,9 @@ class PhotoOrganizerCLI:
         elif opcao == 2:
             self._opcao_renomear(imagens_nao_org, diretorio)
         elif opcao == 3:
-            self._opcao_processo_completo(imagens_nao_org, imagens_org, diretorio)
+            self._opcao_processo_completo(
+                imagens_nao_org, imagens_org, diretorio
+            )
         elif opcao == 4:
             self._opcao_relatorio(todas_imagens)
         elif opcao == 5:
@@ -49,7 +58,9 @@ class PhotoOrganizerCLI:
         elif opcao == 6:
             self._opcao_organizar_eventos(todas_imagens, diretorio)
         elif opcao == 7:
-            self._opcao_organizar_anos(todas_imagens, diretorio)
+            self._opcao_organizar_periodos_customizados(
+                todas_imagens, diretorio
+            )
         elif opcao == 8:
             self._opcao_backup_manual(diretorio, todas_imagens)
         
@@ -156,8 +167,9 @@ class PhotoOrganizerCLI:
             print("💡 Dica: Adicione eventos aos nomes usando a opção de renomeação.")
     
     def _opcao_organizar_anos(self, imagens: List[ImageInfo], diretorio: str) -> None:
-        """Organiza por anos do bebê."""
-        print("🎂 ORGANIZANDO POR ANOS DO BEBÊ...")
+        """Organiza por anos usando sistema legado (compatibilidade)."""
+        print("🎂 ORGANIZANDO POR ANOS (SISTEMA LEGADO)...")
+        print("💡 Esta opção mantém compatibilidade com sistema anterior")
         
         # Primeiro simula
         anos_dict = self.service.organize_by_years(imagens, diretorio, simular=True)
@@ -167,6 +179,75 @@ class PhotoOrganizerCLI:
         elif not anos_dict:
             print("📅 Nenhuma imagem com data válida para organização por anos.")
             print("💡 As imagens devem ter datas a partir de 17/08/2024.")
+    
+    def _opcao_organizar_periodos_customizados(
+        self, 
+        imagens: List[ImageInfo], 
+        diretorio: str
+    ) -> None:
+        """Organiza por períodos usando configuração personalizada."""
+        print("📊 ORGANIZANDO POR PERÍODOS CUSTOMIZADOS...")
+        
+        if not self.configuration:
+            print("⚠️  Configuração personalizada não foi definida!")
+            print("💡 Use a opção 9 para configurar primeiro.")
+            return
+        
+        # Implementação da organização customizada
+        print(f"📅 Período configurado: {self.configuration.data_inicio.strftime('%d/%m/%Y')}")
+        if self.configuration.data_final:
+            print(f"📅 Data final: {self.configuration.data_final.strftime('%d/%m/%Y')}")
+        print(f"🏷️  Prefixo: {self.configuration.prefixo_nomenclatura}")
+        
+        # Aqui seria implementada a lógica de organização personalizada
+        print("🚧 Funcionalidade em desenvolvimento...")
+    
+    def _opcao_configuracao_personalizada(self) -> None:
+        """Permite configurar parâmetros personalizados."""
+        print("⚙️  CONFIGURAÇÃO PERSONALIZADA")
+        print("=" * 50)
+        
+        opcoes = [
+            "1️⃣  Configurar novo projeto personalizado",
+            "2️⃣  Usar configuração compatível (sistema anterior)",
+            "3️⃣  Visualizar configuração atual"
+        ]
+        
+        for opcao in opcoes:
+            print(f"   {opcao}")
+        
+        escolha = input("\n🔢 Escolha uma opção (1-3): ").strip()
+        
+        if escolha == "1":
+            self.configuration = ConfigurationManager.prompt_user_configuration()
+            print("✅ Configuração personalizada aplicada!")
+        elif escolha == "2":
+            self.configuration = ConfigurationManager.create_baby_configuration()
+            print("✅ Configuração compatível aplicada!")
+        elif escolha == "3":
+            self._exibir_configuracao_atual()
+        else:
+            print("❌ Opção inválida!")
+    
+    def _exibir_configuracao_atual(self) -> None:
+        """Exibe a configuração atual."""
+        if not self.configuration:
+            print("⚠️  Nenhuma configuração personalizada definida.")
+            print("💡 Sistema está usando configuração padrão.")
+            return
+        
+        print("\n📋 CONFIGURAÇÃO ATUAL:")
+        print("=" * 40)
+        print(f"📅 Data início: {self.configuration.data_inicio.strftime('%d/%m/%Y')}")
+        if self.configuration.data_final:
+            print(f"📅 Data final: {self.configuration.data_final.strftime('%d/%m/%Y')}")
+        else:
+            print("📅 Data final: Não definida")
+        print(f"🏷️  Prefixo: {self.configuration.prefixo_nomenclatura}")
+        print(f"📊 Período: {'Incluído' if self.configuration.incluir_periodo else 'Não incluído'}")
+        print(f"🔢 Sequencial: {'Incluído' if self.configuration.incluir_sequencial else 'Não incluído'}")
+        print(f"📝 Formato data: {self.configuration.formato_data}")
+        print("=" * 40)
     
     def _opcao_backup_manual(self, diretorio: str, imagens: List[ImageInfo]) -> None:
         """Cria backup manual."""

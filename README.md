@@ -2,7 +2,180 @@
 
 ## 📋 Descrição
 
-Sistema para organização automática de fotos seguindo padrão específico de nomenclatura e organização por datas/eventos.
+Sistema para organização automática de fotos com **configuração totalmente personalizável**. Permite definir datas de início/fim, nomenclatura customizada e diferentes padrões de organização.
+
+### 🆕 Novidades da Versão 2.0
+- ✅ **Configuração Personalizada**: Defina suas próprias datas, prefixos e padrões
+- ✅ **Compatibilidade Total**: Mantém funcionamento com sistema anterior
+- ✅ **Flexibilidade**: Adapte o sistema para qualquer projeto de fotos
+- ✅ **Interface Melhorada**: Menu intuitivo com novas opções
+
+## 🏗️ Arquitetura Refatorada
+
+O projeto segue princípios **SOLID** e **Clean Code** com separação clara de responsabilidades:
+
+```
+src/
+├── cli/                 # Interface de linha de comando
+├── domain/              # Entidades e regras de negócio
+│   ├── image.py         # Modelo de imagem
+│   └── configuration.py # Sistema de configuração personalizável
+├── services/            # Serviços de negócio
+├── utils/               # Utilitários
+```
+
+## 🎯 Princípios SOLID Aplicados
+
+- **S**ingle Responsibility: Cada classe tem uma responsabilidade específica
+- **O**pen/Closed: Extensível sem modificar código existente
+- **L**iskov Substitution: Subclasses substituem classes base
+- **I**nterface Segregation: Interfaces específicas e coesas
+- **D**ependency Inversion: Dependências abstratas, não concretas
+
+## 🚀 Como Usar
+
+### Executar a aplicação:
+```bash
+python main.py
+```
+
+### Configuração Personalizada (Novidade!):
+```python
+from src.domain.configuration import ConfigurationManager
+from datetime import datetime
+
+# Criar configuração personalizada
+config = ConfigurationManager.create_custom_configuration(
+    data_inicio=datetime(2023, 1, 1),
+    data_final=datetime(2023, 12, 31),
+    prefixo="VIAGEM",
+    incluir_periodo=True
+)
+
+# Aplicar na aplicação
+from src.services.photo_organizer_service import PhotoOrganizerService
+service = PhotoOrganizerService(config)
+```
+
+## 📝 Padrões de Nomenclatura
+
+### Sistema Flexível (Novo):
+**Formato configurável:** `[PERÍODO] - [PREFIXO] [DATA](SEQUENCIAL) [- EVENTO]`
+
+Exemplos:
+- `00 - VIAGEM 01012023(00).jpg` (com período)
+- `FOTO 01012023(00).jpg` (sem período)
+- `IMG 15062023(01) - Aniversário.jpg` (com evento)
+
+### Sistema Legado (Compatível):
+**Formato:** `MM - MA 19a DDMMAAAA(XX) [- evento].extensão`
+
+- **MM**: Mês do período (00-12)
+- **MA 19a**: Identificador específico
+- **DDMMAAAA**: Data da foto
+- **XX**: Número sequencial do dia
+- **evento**: Descrição opcional
+
+## ⚙️ Configuração do Sistema
+
+### Menu Principal (Opção 9 - Nova!):
+1. **Configurar novo projeto personalizado**
+   - Define data de início e fim
+   - Escolhe prefixo da nomenclatura
+   - Configura cálculo de períodos
+
+2. **Usar configuração compatível**
+   - Mantém sistema anterior (MA 19a)
+   - Data base: 17/08/2024
+
+3. **Visualizar configuração atual**
+   - Mostra parâmetros ativos
+
+### Exemplo de Configuração Interativa:
+```
+⚙️  CONFIGURAÇÃO PERSONALIZADA DO PROJETO
+============================================================
+📅 Data de início (DD/MM/AAAA): 01/01/2023
+📅 Data final (DD/MM/AAAA) [opcional]: 31/12/2023  
+🏷️  Prefixo da nomenclatura: VIAGEM
+📊 Incluir cálculo de período/mês? (s/N): s
+
+✅ Configuração criada com sucesso!
+   📅 Período: 01/01/2023 até 31/12/2023
+   🏷️  Prefixo: VIAGEM
+   📊 Período: Sim
+```
+
+## 🗓️ Cálculos de Período
+
+### Sistema Flexível:
+- **Período base**: Configurável pelo usuário
+- **Cálculo**: Baseado na data de início definida
+- **Flexibilidade**: Qualquer data de referência
+
+### Sistema Legado (Compatibilidade):
+- **Data de nascimento**: 17/08/2024
+- **Ano 1**: 17/08/2024 a 16/08/2025
+- **Ano 2**: 17/08/2025 a 16/08/2026
+
+## 🔧 Funcionalidades
+
+1. **Análise de Imagens**: Lista e categoriza imagens
+2. **Detecção de Duplicatas**: Identifica e move duplicatas
+3. **Renomeação Flexível**: Aplica padrão configurável
+4. **Organização por Pastas**: Organiza por períodos/eventos
+5. **Relatórios Detalhados**: Estatísticas completas
+6. **Busca por Período**: Localiza fotos em datas específicas
+7. **Sistema de Backup**: Backup automático antes de operações
+8. **Gestão de Eventos**: Adiciona eventos às fotos
+9. **🆕 Configuração Personalizada**: Sistema totalmente flexível
+
+## 🛡️ Segurança
+
+- **Backup automático** antes de qualquer operação destrutiva
+- **Modo simulação** para prévia de todas as operações
+- **Validação** de datas e formatos
+- **Recuperação** de dados via backups
+
+## 🧪 Testes
+
+```bash
+# Executar testes
+python -m pytest tests/
+
+# Teste específico
+python tests/test_image.py
+```
+
+## 📈 Benefícios da Refatoração v2.0
+
+- ✅ **Flexibilidade Total**: Configure para qualquer projeto
+- ✅ **Compatibilidade**: Sistema anterior funciona normalmente
+- ✅ **Manutenibilidade**: Código mais fácil de manter
+- ✅ **Testabilidade**: Cada componente testável independentemente
+- ✅ **Extensibilidade**: Novas funcionalidades fáceis de adicionar
+- ✅ **Reutilização**: Configurações salvadas e reutilizáveis
+- ✅ **Separação de Responsabilidades**: Cada classe tem um propósito claro
+- ✅ **Baixo Acoplamento**: Componentes independentes
+
+## 🔄 Migração do Sistema Anterior
+
+O novo sistema mantém **total compatibilidade** com o anterior:
+
+1. **Automática**: Sistema detecta configuração legada
+2. **Opcional**: Pode migrar para novo sistema gradualmente  
+3. **Reversível**: Sempre pode voltar ao sistema anterior
+4. **Dados**: Nenhuma perda de dados ou configurações
+
+## 📋 Próximas Implementações
+
+- ✅ ~~Configuração personalizada~~
+- ✅ ~~Sistema flexível de nomenclatura~~
+- 🚧 Organizar vídeos também
+- 🚧 Interface gráfica (GUI)
+- 🚧 Configurações salvas em arquivo
+- 🚧 Templates de configuração predefinidos
+- 🚧 Integração com cloud storage
 
 ## 🏗️ Arquitetura Refatorada
 

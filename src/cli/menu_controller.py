@@ -19,23 +19,24 @@ class MenuController:
         print("   4️⃣  Relatório detalhado")
         print("   5️⃣  Buscar fotos por período")
         print("   6️⃣  Organizar por pastas de eventos")
-        print("   7️⃣  Organizar por anos do bebê")
+        print("   7️⃣  Organizar por períodos customizados")
         print("   8️⃣  Criar backup do estado atual")
+        print("   9️⃣  Configuração personalizada")
         print()
-        print("🎯 FORMATO DE NOMENCLATURA:")
-        print("   📅 MM - MA 19a DDMMAAAA(XX) [- evento]")
-        print("   📝 Onde: MM=mês do bebê, DD/MM/AAAA=data, XX=sequencial")
-        print("   🗓️ Organização automática por anos a partir de 17/08/2024")
+        print("🎯 NOMENCLATURA CONFIGURÁVEL:")
+        print("   📅 Sistema flexível - configure suas preferências")
+        print("   📝 Padrão compatível com sistema anterior disponível")
+        print("   🗓️ Períodos e datas totalmente personalizáveis")
         print()
         print("=" * 70)
         
         while True:
             try:
-                opcao = input("\n🔢 Escolha uma opção (1-8): ").strip()
-                if opcao in ['1', '2', '3', '4', '5', '6', '7', '8']:
+                opcao = input("\n🔢 Escolha uma opção (1-9): ").strip()
+                if opcao in ['1', '2', '3', '4', '5', '6', '7', '8', '9']:
                     return int(opcao)
                 else:
-                    print("❌ Opção inválida! Digite um número de 1 a 8.")
+                    print("❌ Opção inválida! Digite um número de 1 a 9.")
             except KeyboardInterrupt:
                 print("\n\n👋 Operação cancelada pelo usuário.")
                 exit(0)

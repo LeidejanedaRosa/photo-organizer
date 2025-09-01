@@ -1,6 +1,7 @@
 from typing import Dict, List, Optional
 
 from ..domain.image import ImageInfo
+from ..domain.configuration import ProjectConfiguration, ConfigurationManager
 from .image_analyzer import ImageAnalyzer
 from .duplicate_manager import DuplicateManager
 from .file_renamer import FileRenamer, FilenameGenerator
@@ -11,18 +12,24 @@ from .report_generator import ReportGenerator
 
 class PhotoOrganizerService:
     """
-    Serviço principal que orquestra todas as operações de organização de fotos.
-    Segue o princípio Single Responsibility - cada serviço tem uma responsabilidade.
+    Serviço principal que orquestra operações de organização de fotos.
+    Segue o princípio Single Responsibility.
     """
     
-    def __init__(self):
+    def __init__(self, configuration: Optional[ProjectConfiguration] = None):
+        self.configuration = configuration
         self.image_analyzer = ImageAnalyzer()
         self.duplicate_manager = DuplicateManager()
         self.file_renamer = FileRenamer()
         self.folder_organizer = FolderOrganizer()
         self.backup_manager = BackupManager()
         self.report_generator = ReportGenerator()
-        self.filename_generator = FilenameGenerator()
+        self.filename_generator = FilenameGenerator(configuration)
+    
+    def set_configuration(self, configuration: ProjectConfiguration) -> None:
+        """Define uma nova configuração para o serviço."""
+        self.configuration = configuration
+        self.filename_generator = FilenameGenerator(configuration)
     
     def analyze_directory(self, diretorio: str) -> tuple[List[ImageInfo], List[ImageInfo]]:
         """

@@ -53,32 +53,62 @@ class ImageInfo:
         return hash(self.arquivo)
 
 
+class PeriodCalculator:
+    """Calcula períodos baseado em configuração personalizada."""
+    
+    def __init__(self, data_inicio: datetime):
+        self.data_inicio = data_inicio
+    
+    def calculate_year(self, data: datetime) -> int:
+        """
+        Calcula qual ano do período baseado na data da foto.
+        """
+        if data < self.data_inicio:
+            return 0
+        
+        anos_passados = data.year - self.data_inicio.year
+        aniversario_atual = datetime(
+            data.year,
+            self.data_inicio.month,
+            self.data_inicio.day
+        )
+        
+        if data >= aniversario_atual:
+            return anos_passados + 1
+        else:
+            return anos_passados if anos_passados > 0 else 1
+    
+    def calculate_month(self, data: datetime) -> int:
+        """Calcula o mês do período baseado na data da foto."""
+        if data < self.data_inicio:
+            return 0
+        
+        # Calcula diferença em meses
+        anos_diff = data.year - self.data_inicio.year
+        meses_diff = anos_diff * 12 + (data.month - self.data_inicio.month)
+        
+        # Ajusta baseado no dia
+        if data.day >= self.data_inicio.day:
+            return meses_diff
+        else:
+            return meses_diff - 1 if meses_diff > 0 else 0
+
+
+# Mantém compatibilidade com código existente
 class BabyAge:
-    """Representa a idade do bebê e operações relacionadas."""
+    """Compatibilidade com sistema anterior - calcula idade do bebê."""
     
     BIRTH_DATE = datetime(2024, 8, 17)
     
     @classmethod
     def calculate_year(cls, data: datetime) -> int:
-        """
-        Calcula qual ano do bebê baseado na data da foto.
-        Ano 1: 17/08/2024 a 16/08/2025
-        Ano 2: 17/08/2025 a 16/08/2026
-        """
-        if data < cls.BIRTH_DATE:
-            return 0
-        
-        anos_passados = data.year - cls.BIRTH_DATE.year
-        aniversario_atual = datetime(data.year, 8, 17)
-        
-        if data >= aniversario_atual:
-            return anos_passados + 1
-        else:
-            return anos_passados
+        """Mantém compatibilidade - calcula ano do bebê."""
+        calculator = PeriodCalculator(cls.BIRTH_DATE)
+        return calculator.calculate_year(data)
     
     @classmethod
     def calculate_month(cls, data: datetime) -> int:
-        """Calcula o mês do bebê baseado na data da foto."""
+        """Mantém compatibilidade - calcula mês do bebê com lógica original."""
         mes = data.month
         dia = data.day
         

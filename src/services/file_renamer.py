@@ -6,10 +6,20 @@ from typing import Dict, List, Optional
 from collections import defaultdict
 
 from ..domain.image import ImageInfo, BabyAge, Event
+from ..domain.configuration import ProjectConfiguration, ConfigurationManager
 
 
 class FilenameGenerator:
-    """Responsável por gerar nomes de arquivos seguindo o padrão estabelecido."""
+    """Responsável por gerar nomes de arquivos seguindo padrão configurado."""
+    
+    def __init__(self, configuration: Optional[ProjectConfiguration] = None):
+        """
+        Inicializa com uma configuração específica.
+        Se não fornecida, usa configuração padrão compatível.
+        """
+        self.configuration = (
+            configuration or ConfigurationManager.create_baby_configuration()
+        )
     
     def generate_filename(
         self,
@@ -18,9 +28,55 @@ class FilenameGenerator:
         eventos: Optional[Dict[str, str]] = None
     ) -> str:
         """
-        Gera um novo nome para o arquivo baseado no padrão.
+        Gera um novo nome para o arquivo baseado na configuração.
+        """
+        data = info.data_preferencial
         
-        Formato: MM - MA 19a DDMMAAAA(XX) [- evento].extensão
+        # Verifica se a data está no período configurado
+        if not self.configuration.is_date_in_range(data):
+            # Para datas fora do período, usa apenas data e sequencial
+            nome_base = data.strftime(self.configuration.formato_data)
+            if self.configuration.incluir_sequencial:
+                nome_base += f"({numero_sequencial:02d})"
+        else:
+            # Gera nome usando a configuração
+            evento_str = None
+            if eventos:
+                data_fmt = data.strftime('%d%m%Y')
+                evento_str = eventos.get(data_fmt)
+            
+            nome_base = self.configuration.generate_filename_pattern(
+                data, numero_sequencial, evento_str
+            )
+        
+        return nome_base + info.extensao
+    
+    def is_organized(self, nome_arquivo: str) -> bool:
+        """
+        Verifica se o arquivo já segue algum padrão de organização.
+        Verifica tanto o padrão novo quanto o antigo (compatibilidade).
+        """
+        nome_sem_ext = Path(nome_arquivo).stem
+        
+        # Padrão antigo: MM - MA 19a DDMMAAAA(XX)[- evento]
+        padrao_antigo = r'^\d{2} - MA 19a \d{8}\(\d{2}\)(?:\s-\s.+)?$'
+        
+        # Padrão novo genérico: qualquer coisa com data e sequencial
+        padrao_novo = r'.*\d{8}\(\d{2}\)(?:\s-\s.+)?$'
+        
+        return (
+            bool(re.match(padrao_antigo, nome_sem_ext)) or
+            bool(re.match(padrao_novo, nome_sem_ext))
+        )
+    
+    def generate_filename_legacy(
+        self,
+        info: ImageInfo,
+        numero_sequencial: int = 0,
+        eventos: Optional[Dict[str, str]] = None
+    ) -> str:
+        """
+        Mantém compatibilidade com sistema anterior (formato bebê).
         """
         data = info.data_preferencial
         mes_bebe = BabyAge.calculate_month(data)
@@ -37,15 +93,6 @@ class FilenameGenerator:
                 novo_nome = f"{novo_nome} - {eventos[data_fmt]}"
         
         return novo_nome + info.extensao
-    
-    def is_organized(self, nome_arquivo: str) -> bool:
-        """
-        Verifica se o arquivo já segue o padrão de organização.
-        Formato: MM - MA 19a DDMMAAAA(XX)[- evento].extensão
-        """
-        nome_sem_ext = Path(nome_arquivo).stem
-        padrao = r'^\d{2} - MA 19a \d{8}\(\d{2}\)(?:\s-\s.+)?$'
-        return bool(re.match(padrao, nome_sem_ext))
 
 
 class FileRenamer:
