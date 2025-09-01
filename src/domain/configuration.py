@@ -44,7 +44,16 @@ class ProjectConfiguration:
     def calculate_period_number(self, data: datetime) -> int:
         """
         Calcula o número do período baseado na data da foto.
-        Similar ao cálculo do "mês do bebê", mas genérico.
+        
+        Sistema de ano fiscal personalizado:
+        - Período 00: Do dia inicial até final do primeiro mês
+        - Períodos seguintes: Meses completos em sequência
+        
+        Exemplo: Início 08/03/2025
+        - 08/03 a 31/03/2025 = período 00
+        - 01/04 a 30/04/2025 = período 01  
+        - 01/05 a 31/05/2025 = período 02
+        - etc.
         """
         if not self.incluir_periodo:
             return 0
@@ -52,14 +61,11 @@ class ProjectConfiguration:
         if data < self.data_inicio:
             return 0
         
-        # Calcula diferença em meses
-        meses_diff = (data.year - self.data_inicio.year) * 12 + (data.month - self.data_inicio.month)
+        # Calcula diferença em meses calendário
+        anos_diff = data.year - self.data_inicio.year
+        meses_diff = anos_diff * 12 + (data.month - self.data_inicio.month)
         
-        # Ajusta baseado no dia
-        if data.day >= self.data_inicio.day:
-            return meses_diff
-        else:
-            return meses_diff - 1 if meses_diff > 0 else 0
+        return meses_diff
     
     def calculate_year_number(self, data: datetime) -> int:
         """
