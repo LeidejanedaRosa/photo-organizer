@@ -6,37 +6,55 @@ class MenuController:
     """Responsável por exibir menus e capturar entradas do usuário."""
     
     @staticmethod
-    def exibir_menu_inicial() -> int:
-        """Exibe um menu inicial bonito e retorna a opção escolhida."""
+    def exibir_menu_inteligente(tem_fotos_organizadas: bool, tem_configuracao: bool) -> int:
+        """Exibe menu adaptativo baseado no estado atual do sistema."""
         print("=" * 70)
         print("🖼️  ORGANIZADOR DE FOTOS  🖼️")
         print("=" * 70)
         print()
-        print("📋 FUNCIONALIDADES DISPONÍVEIS:")
-        print("   1️⃣  Detectar e mover duplicatas")
-        print("   2️⃣  Ordenar fotos por data")
-        print("   3️⃣  Fazer tudo (duplicatas + ordenação)")
-        print("   4️⃣  Relatório detalhado")
-        print("   5️⃣  Buscar fotos por período")
-        print("   6️⃣  Organizar por eventos")
-        print("   7️⃣  Organizar por períodos customizados")
-        print("   8️⃣  Criar backup do estado atual")
-        print("   9️⃣  Como você quer nomear suas fotos?")
-        print()
-        print("🎯 NOMENCLATURA CONFIGURÁVEL:")
-        print("   📅 Sistema flexível - configure suas preferências")
-        print("   📝 Padrão compatível com sistema anterior disponível")
-        print("   🗓️ Períodos e datas totalmente personalizáveis")
-        print()
+        
+        if not tem_fotos_organizadas:
+            # Menu para primeiro acesso ou pastas não organizadas
+            print("� PRIMEIROS PASSOS:")
+            print("   1️⃣  Configurar como nomear suas fotos")
+            print("   2️⃣  Remover fotos duplicadas")  
+            print("   3️⃣  Organizar fotos em ordem cronológica")
+            print("   4️⃣  Fazer tudo (duplicatas + renomeação)")
+            print()
+            print("📊 INFORMAÇÕES:")
+            print("   5️⃣  Ver relatório das suas fotos")
+            opcoes_validas = ['1', '2', '3', '4', '5']
+            max_opcao = 5
+        else:
+            # Menu completo para pastas já organizadas
+            print("🔧 ORGANIZAÇÃO:")
+            print("   1️⃣  Configurar nomenclatura das fotos")
+            print("   2️⃣  Remover fotos duplicadas")
+            print("   3️⃣  Organizar fotos em ordem cronológica") 
+            print("   4️⃣  Fazer tudo (duplicatas + renomeação)")
+            print()
+            print("📁 ORGANIZAR EM PASTAS:")
+            print("   5️⃣  Criar pastas por eventos nas fotos")
+            print("   6️⃣  Criar pastas por períodos personalizados")
+            print()
+            print("🔍 BUSCA E RELATÓRIOS:")
+            print("   7️⃣  Buscar fotos por período específico")
+            print("   8️⃣  Ver relatório detalhado")
+            print()
+            print("💾 BACKUP:")
+            print("   9️⃣  Criar backup do estado atual")
+            opcoes_validas = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+            max_opcao = 9
+        
         print("=" * 70)
         
         while True:
             try:
-                opcao = input("\n🔢 Escolha uma opção (1-9): ").strip()
-                if opcao in ['1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                opcao = input(f"\n🔢 Escolha uma opção (1-{max_opcao}): ").strip()
+                if opcao in opcoes_validas:
                     return int(opcao)
                 else:
-                    print("❌ Opção inválida! Digite um número de 1 a 9.")
+                    print(f"❌ Opção inválida! Digite um número de 1 a {max_opcao}.")
             except KeyboardInterrupt:
                 print("\n\n👋 Operação cancelada pelo usuário.")
                 exit(0)

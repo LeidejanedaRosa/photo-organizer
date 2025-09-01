@@ -21,16 +21,88 @@ class PhotoOrganizerCLI:
     def run(self) -> None:
         """Executa a aplicação CLI."""
         try:
-            opcao = self.menu.exibir_menu_inicial()
             diretorio = self.menu.solicitar_diretorio()
-            self._executar_opcao(opcao, diretorio)
+            
+            # Análise inicial para determinar estado do sistema
+            imagens_nao_org, imagens_org = self.service.analyze_directory(diretorio)
+            tem_fotos_organizadas = len(imagens_org) > 0
+            tem_configuracao = self.configuration is not None
+            
+            # Exibe menu adaptativo
+            opcao = self.menu.exibir_menu_inteligente(
+                tem_fotos_organizadas, tem_configuracao
+            )
+            
+            self._executar_opcao_inteligente(
+                opcao, diretorio, imagens_nao_org, imagens_org,
+                tem_fotos_organizadas, tem_configuracao
+            )
         except KeyboardInterrupt:
             print("\n\n👋 Programa encerrado pelo usuário.")
         except Exception as e:
             print(f"\n❌ Erro inesperado: {e}")
             print("🔧 Verifique o diretório e tente novamente.")
     
-    def _executar_opcao(self, opcao: int, diretorio: str) -> None:
+    def _executar_opcao_inteligente(
+        self, 
+        opcao: int, 
+        diretorio: str,
+        imagens_nao_org: List[ImageInfo],
+        imagens_org: List[ImageInfo],
+        tem_fotos_organizadas: bool,
+        tem_configuracao: bool
+    ) -> None:
+        """Executa opção do menu inteligente mapeando para funções corretas."""
+        self.menu.imprimir_separador()
+        
+        # Define configuração no serviço se existir
+        if self.configuration:
+            self.service.set_configuration(self.configuration)
+        
+        todas_imagens = imagens_nao_org + imagens_org
+        
+        if not tem_fotos_organizadas:
+            # Menu para primeiro acesso (5 opções)
+            if opcao == 1:
+                self._opcao_configuracao_personalizada()
+            elif opcao == 2:
+                self._opcao_duplicatas(todas_imagens, diretorio)
+            elif opcao == 3:
+                self._opcao_renomear(imagens_nao_org, diretorio)
+            elif opcao == 4:
+                self._opcao_processo_completo(
+                    imagens_nao_org, imagens_org, diretorio
+                )
+            elif opcao == 5:
+                self._opcao_relatorio(todas_imagens)
+        else:
+            # Menu completo (9 opções)
+            if opcao == 1:
+                self._opcao_configuracao_personalizada()
+            elif opcao == 2:
+                self._opcao_duplicatas(todas_imagens, diretorio)
+            elif opcao == 3:
+                self._opcao_renomear(imagens_nao_org, diretorio)
+            elif opcao == 4:
+                self._opcao_processo_completo(
+                    imagens_nao_org, imagens_org, diretorio
+                )
+            elif opcao == 5:
+                self._opcao_organizar_eventos(todas_imagens, diretorio)
+            elif opcao == 6:
+                self._opcao_organizar_periodos_customizados(
+                    todas_imagens, diretorio
+                )
+            elif opcao == 7:
+                self._opcao_buscar_periodo(todas_imagens)
+            elif opcao == 8:
+                self._opcao_relatorio(todas_imagens)
+            elif opcao == 9:
+                self._opcao_backup_manual(diretorio, todas_imagens)
+        
+        self.menu.imprimir_conclusao()
+    
+    def _executar_opcao_legado(self, opcao: int, diretorio: str) -> None:
         """Executa a opção escolhida pelo usuário."""
         self.menu.imprimir_separador()
         
