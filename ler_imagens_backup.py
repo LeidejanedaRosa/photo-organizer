@@ -250,14 +250,14 @@ def buscar_fotos_periodo(
 def esta_organizada(nome_arquivo: str) -> bool:
     """
     Verifica se o arquivo já segue o padrão de organização.
-    Formato esperado: MM - MA 19a DDMMAAAA(XX)[- evento].extensão
+    Formato esperado: MM - IMG DDMMAAAA(XX)[- evento].extensão
     """
     # Remove a extensão para análise
     nome_sem_ext = Path(nome_arquivo).stem
     
     # Padrão regex para detectar arquivos já organizados
-    # Formato: DD - MA 19a DDMMAAAA(XX) opcionalmente seguido de - evento
-    padrao = r'^\d{2} - MA 19a \d{8}\(\d{2}\)(?:\s-\s.+)?$'
+    # Formato: DD - IMG DDMMAAAA(XX) opcionalmente seguido de - evento
+    padrao = r'^\d{2} - IMG \d{8}\(\d{2}\)(?:\s-\s.+)?$'
     
     return bool(re.match(padrao, nome_sem_ext))
 
@@ -583,11 +583,11 @@ def detectar_eventos_nos_arquivos(
         # Verifica se o arquivo já está organizado e tem evento
         if esta_organizada(img.arquivo):
             # Extrai o evento do nome se existir
-            # Formato: MM - MA 19a DDMMAAAA(XX) - EVENTO.ext
+            # Formato: MM - IMG DDMMAAAA(XX) - EVENTO.ext
             nome_sem_ext = Path(img.arquivo).stem
             if ' - ' in nome_sem_ext:
                 partes = nome_sem_ext.split(' - ')
-                # Tem pelo menos MM, MA 19a DDMMAAAA(XX), EVENTO
+                # Tem pelo menos MM, IMG DDMMAAAA(XX), EVENTO
                 if len(partes) >= 3:
                     # Pega tudo após o segundo " - "
                     evento = ' - '.join(partes[2:])
@@ -667,7 +667,7 @@ def gerar_novo_nome(
     
     # Gera o novo nome no formato solicitado
     novo_nome = (
-        f"{mes_bebe:02d} - MA 19a "
+        f"{mes_bebe:02d} - IMG "
         f"{data.strftime('%d%m%Y')}"
     )
     
@@ -868,7 +868,7 @@ def exibir_menu_inicial():
     print("   9️⃣  Criar backup do estado atual")
     print()
     print("🎯 FORMATO DE NOMENCLATURA:")
-    print("   📅 MM - MA 19a DDMMAAAA(XX) [- evento]")
+    print("   📅 MM - IMG DDMMAAAA(XX) [- evento]")
     print("   📝 Onde: MM=mês do bebê, DD/MM/AAAA=data, XX=sequencial")
     print("   🗓️ Organização automática por anos a partir de 17/08/2024")
     print()

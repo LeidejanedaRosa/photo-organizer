@@ -58,8 +58,8 @@ class FilenameGenerator:
         """
         nome_sem_ext = Path(nome_arquivo).stem
         
-        # Padrão antigo: MM - MA 19a DDMMAAAA(XX)[- evento]
-        padrao_antigo = r'^\d{2} - MA 19a \d{8}\(\d{2}\)(?:\s-\s.+)?$'
+        # Padrão antigo: MM - IMG DDMMAAAA(XX)[- evento]
+        padrao_antigo = r'^\d{2} - IMG \d{8}\(\d{2}\)(?:\s-\s.+)?$'
         
         # Padrão novo genérico: qualquer coisa com data e sequencial
         padrao_novo = r'.*\d{8}\(\d{2}\)(?:\s-\s.+)?$'
@@ -82,7 +82,7 @@ class FilenameGenerator:
         mes_bebe = BabyAge.calculate_month(data)
         
         novo_nome = (
-            f"{mes_bebe:02d} - MA 19a "
+            f"{mes_bebe:02d} - IMG "
             f"{data.strftime('%d%m%Y')}"
             f"({numero_sequencial:02d})"
         )

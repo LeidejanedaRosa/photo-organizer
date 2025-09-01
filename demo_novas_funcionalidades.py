@@ -166,7 +166,7 @@ def demo_comparacao():
     print(f"   🏷️  {nome_antigo}")
     print("   📝 Características:")
     print("   ✓ Baseado em data fixa (17/08/2024)")
-    print("   ✓ Prefixo fixo (MA 19a)")
+    print("   ✓ Prefixo fixo (IMG)")
     print("   ✓ Cálculo específico de mês do bebê")
     
     print()

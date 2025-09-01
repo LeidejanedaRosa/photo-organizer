@@ -97,8 +97,8 @@ service = PhotoOrganizerService(config)
 - `12 - PROJ - 25122023(02) - Natal.jpg` (com evento)
 
 ### **Sistema Legado (Compatível)**
-- `01 - MA 19a - 15092024(00).jpg`
-- `05 - MA 19a - 20012025(01) - Aniversário.jpg`
+- `01 - IMG - 15092024(00).jpg`
+- `05 - IMG - 20012025(01) - Aniversário.jpg`
 
 ---
 
@@ -108,7 +108,7 @@ service = PhotoOrganizerService(config)
 - ✅ Todos os arquivos já organizados permanecem funcionais
 - ✅ Configuração legada disponível via `ConfigurationManager.create_baby_configuration()`
 - ✅ Opção 7 mantém comportamento original de "anos do bebê"
-- ✅ Nomenclatura "MA 19a" preservada quando necessário
+- ✅ Nomenclatura "IMG" preservada quando necessário
 
 ### **Migração Gradual**
 - 🔄 Pode usar sistema novo e antigo simultaneamente

@@ -27,7 +27,7 @@ class ProjectConfiguration:
         Args:
             data_inicio: Data de início do projeto/período
             data_final: Data final do projeto (opcional)
-            prefixo_nomenclatura: Prefixo para nomenclatura (ex: "MA 19a", "IMG", etc)
+            prefixo_nomenclatura: Prefixo para nomenclatura (ex: "IMG", "IMG", etc)
             separador: Separador entre elementos do nome
             incluir_periodo: Se deve incluir cálculo de período (mês/ano)
             incluir_sequencial: Se deve incluir numeração sequencial
@@ -144,7 +144,7 @@ class ConfigurationManager:
         """
         return ProjectConfiguration(
             data_inicio=datetime(2024, 8, 17),
-            prefixo_nomenclatura="MA 19a",
+            prefixo_nomenclatura="IMG",
             separador=" - ",
             incluir_periodo=True,
             incluir_sequencial=True,
@@ -204,8 +204,15 @@ class ConfigurationManager:
             prefixo = "IMG"
         
         # Incluir cálculo de período
-        incluir_periodo_input = input("📊 Incluir cálculo de período/mês? (s/N): ").strip().lower()
-        incluir_periodo = incluir_periodo_input in ['s', 'sim', 'y', 'yes']
+        print("\n📊 NUMERAÇÃO SEQUENCIAL:")
+        print("   ✅ COM números: 00-FOTO-data, 01-FOTO-data (ordem cronológica)")
+        print("   ❌ SEM números: FOTO-data (ordem alfabética quebrada)")
+        incluir_periodo_input = input(
+            "📊 Incluir numeração sequencial? (S/n): "
+        ).strip().lower()
+        incluir_periodo = incluir_periodo_input not in [
+            'n', 'nao', 'no', 'não'
+        ]
         
         print("\n✅ Configuração criada com sucesso!")
         print(f"   📅 Período: {data_inicio.strftime('%d/%m/%Y')}", end="")

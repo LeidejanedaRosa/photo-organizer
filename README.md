@@ -68,10 +68,10 @@ Exemplos:
 - `IMG 15062023(01) - Aniversário.jpg` (com evento)
 
 ### Sistema Legado (Compatível):
-**Formato:** `MM - MA 19a DDMMAAAA(XX) [- evento].extensão`
+**Formato:** `MM - IMG DDMMAAAA(XX) [- evento].extensão`
 
 - **MM**: Mês do período (00-12)
-- **MA 19a**: Identificador específico
+- **IMG**: Identificador específico
 - **DDMMAAAA**: Data da foto
 - **XX**: Número sequencial do dia
 - **evento**: Descrição opcional
@@ -85,7 +85,7 @@ Exemplos:
    - Configura cálculo de períodos
 
 2. **Usar configuração compatível**
-   - Mantém sistema anterior (MA 19a)
+   - Mantém sistema anterior (IMG)
    - Data base: 17/08/2024
 
 3. **Visualizar configuração atual**
@@ -243,10 +243,10 @@ service.generate_report(imagens_nao_org + imagens_org)
 
 ## 📝 Padrão de Nomenclatura
 
-**Formato:** `MM - MA 19a DDMMAAAA(XX) [- evento].extensão`
+**Formato:** `MM - IMG DDMMAAAA(XX) [- evento].extensão`
 
 - **MM**: Mês do bebê (00-12)
-- **MA 19a**: Identificador fixo (Maria Antônia 19ª)
+- **IMG**: Identificador fixo (Maria Antônia 19ª)
 - **DDMMAAAA**: Data da foto
 - **XX**: Número sequencial do dia
 - **evento**: Descrição opcional do evento
@@ -297,4 +297,4 @@ Implementar:
 
 - Organizar vídeos também
 
-- Remover os dados pré-estabelecidos e deixar o usuário definir, como: qual a data de início da pasta, qual a data final, qual será o padrão da nomenclatura das imagens (MA 19a DDMMAAAA)
+- Remover os dados pré-estabelecidos e deixar o usuário definir, como: qual a data de início da pasta, qual a data final, qual será o padrão da nomenclatura das imagens (IMG DDMMAAAA)
