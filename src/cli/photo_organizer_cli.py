@@ -193,14 +193,32 @@ class PhotoOrganizerCLI:
             print("💡 Use a opção 9 para configurar primeiro.")
             return
         
-        # Implementação da organização customizada
+        # Mostra configuração
         print(f"📅 Período configurado: {self.configuration.data_inicio.strftime('%d/%m/%Y')}")
         if self.configuration.data_final:
             print(f"📅 Data final: {self.configuration.data_final.strftime('%d/%m/%Y')}")
         print(f"🏷️  Prefixo: {self.configuration.prefixo_nomenclatura}")
         
-        # Aqui seria implementada a lógica de organização personalizada
-        print("🚧 Funcionalidade em desenvolvimento...")
+        # Primeiro simula
+        print("\n🔍 Simulando organização...")
+        resultado = self.service.organize_by_custom_periods(
+            imagens, diretorio, self.configuration, simular=True)
+        
+        if not resultado:
+            print("ℹ️  Nenhuma organização necessária.")
+            return
+        
+        # Mostra resultado da simulação
+        print("\n📊 Resultado da simulação:")
+        for periodo, imgs in resultado.items():
+            print(f"  📁 {periodo}: {len(imgs)} imagens")
+        
+        # Pergunta se executa
+        if self.menu.confirmar_operacao("Executar organização por períodos?"):
+            print("\n� Executando organização...")
+            self.service.organize_by_custom_periods(
+                imagens, diretorio, self.configuration, simular=False)
+            print("✅ Organização concluída!")
     
     def _opcao_configuracao_personalizada(self) -> None:
         """Permite configurar parâmetros personalizados."""

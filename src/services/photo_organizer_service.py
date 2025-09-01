@@ -111,27 +111,44 @@ class PhotoOrganizerService:
             print(f"💾 Backup criado: {backup_file}")
         
         return self.folder_organizer.organize_by_events(diretorio, eventos_detectados, simular)
-    
+
+    def organize_by_custom_periods(
+        self,
+        imagens: List[ImageInfo],
+        diretorio: str,
+        configuracao: 'ProjectConfiguration',
+        simular: bool = True
+    ) -> Dict[str, List[ImageInfo]]:
+        """Organiza imagens por períodos personalizados."""
+        if not simular and imagens:
+            backup_file = self.backup_manager.create_backup(
+                diretorio, "organizar_periodos")
+            print(f"💾 Backup criado: {backup_file}")
+
+        return self.folder_organizer.organize_by_custom_periods(
+            imagens, diretorio, configuracao, simular)
+
     def generate_report(self, imagens: List[ImageInfo]) -> None:
         """Gera relatório detalhado das imagens."""
         self.report_generator.generate_detailed_report(imagens)
     
     def search_photos_by_period(
-        self, 
-        imagens: List[ImageInfo], 
-        data_inicio: str, 
+        self,
+        imagens: List[ImageInfo],
+        data_inicio: str,
         data_fim: str
     ) -> List[ImageInfo]:
         """Busca fotos por período."""
-        return self.report_generator.search_photos_by_period(imagens, data_inicio, data_fim)
+        return self.report_generator.search_photos_by_period(
+            imagens, data_inicio, data_fim)
     
     def create_manual_backup(self, diretorio: str) -> str:
         """Cria backup manual."""
         return self.backup_manager.create_backup(diretorio, "backup_manual")
     
     def print_analysis_statistics(
-        self, 
-        imagens_nao_organizadas: List[ImageInfo], 
+        self,
+        imagens_nao_organizadas: List[ImageInfo],
         imagens_organizadas: List[ImageInfo]
     ) -> None:
         """Imprime estatísticas da análise."""
@@ -167,8 +184,10 @@ class PhotoOrganizerService:
             print(f"Dimensões: {img.dimensoes}")
             print(f"Modo: {img.modo}")
             print(f"Tamanho (bytes): {img.tamanho}")
-            print(f"Data de modificação: {img.data_mod.strftime('%d/%m/%Y %H:%M:%S')}")
+            print(f"Data de modificação: "
+                  f"{img.data_mod.strftime('%d/%m/%Y %H:%M:%S')}")
             if img.data_exif:
-                print(f"Data EXIF: {img.data_exif.strftime('%d/%m/%Y %H:%M:%S')}")
+                print(f"Data EXIF: "
+                      f"{img.data_exif.strftime('%d/%m/%Y %H:%M:%S')}")
             print(f"Mês do bebê: {mes_bebe:02d}")
             print("-" * 40)

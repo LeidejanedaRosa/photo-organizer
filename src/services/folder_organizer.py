@@ -1,10 +1,11 @@
 import os
 import shutil
-from typing import Dict, List
+from typing import Dict, List, Optional
 from collections import defaultdict
 from pathlib import Path
 
 from ..domain.image import ImageInfo, BabyAge
+from ..domain.configuration import ProjectConfiguration
 
 
 class FolderOrganizer:
@@ -147,6 +148,121 @@ class FolderOrganizer:
         
         return total_movidos
     
+    def organize_by_custom_periods(
+        self,
+        imagens: List[ImageInfo],
+        diretorio: str,
+        configuration: ProjectConfiguration,
+        simular: bool = True
+    ) -> Dict[str, List[ImageInfo]]:
+        """
+        Organiza imagens por períodos customizados.
+        Cria pastas para períodos atual e futuros conforme necessário.
+        
+        Returns:
+            Dicionário com pasta -> lista de imagens
+        """
+        if not imagens:
+            return {}
+        
+        # Separa imagens por período
+        imagens_periodo_atual = []
+        imagens_periodo_futuro = []
+        nova_config = None
+        
+        for img in imagens:
+            data = img.data_preferencial
+            
+            if configuration.is_date_in_range(data):
+                imagens_periodo_atual.append(img)
+            elif configuration.should_create_new_period(data):
+                imagens_periodo_futuro.append(img)
+                if nova_config is None:
+                    nova_config = configuration.suggest_new_period_config(data)
+        
+        resultado = {}
+        
+        if simular:
+            print("\n🔄 SIMULAÇÃO: Organizando por períodos customizados...")
+        else:
+            print("\n📅 ORGANIZANDO POR PERÍODOS CUSTOMIZADOS...")
+        
+        print("─" * 70)
+        
+        # Organiza período atual
+        if imagens_periodo_atual:
+            nome_pasta_atual = self._gerar_nome_pasta_periodo(configuration)
+            resultado[nome_pasta_atual] = imagens_periodo_atual
+            
+            if not simular:
+                self._criar_pasta_e_mover(
+                    imagens_periodo_atual,
+                    diretorio,
+                    nome_pasta_atual
+                )
+            
+            print(f"📁 {nome_pasta_atual}: {len(imagens_periodo_atual)} imagens")
+        
+        # Organiza período futuro (se houver)
+        if imagens_periodo_futuro and nova_config:
+            nome_pasta_futura = self._gerar_nome_pasta_periodo(nova_config)
+            resultado[nome_pasta_futura] = imagens_periodo_futuro
+            
+            if not simular:
+                self._criar_pasta_e_mover(
+                    imagens_periodo_futuro,
+                    diretorio,
+                    nome_pasta_futura
+                )
+            
+            print(f"📁 {nome_pasta_futura}: "
+                  f"{len(imagens_periodo_futuro)} imagens")
+            print("   ⚠️  Novo período detectado!")
+        
+        if not resultado:
+            print("📅 Nenhuma imagem para organizar por períodos.")
+        
+        print("─" * 70)
+        return resultado
+    
+    def _gerar_nome_pasta_periodo(self, config: ProjectConfiguration) -> str:
+        """Gera nome da pasta baseado na configuração do período."""
+        inicio = config.data_inicio.strftime("%d-%m-%Y")
+        if config.data_final:
+            final = config.data_final.strftime("%d-%m-%Y")
+        else:
+            final = "indefinido"
+        prefixo = config.prefixo_nomenclatura.replace(" ", "_")
+        
+        return f"{prefixo}_{inicio}_a_{final}"
+    
+    def _criar_pasta_e_mover(
+        self,
+        imagens: List[ImageInfo],
+        diretorio_base: str,
+        nome_pasta: str
+    ) -> None:
+        """Cria pasta e move imagens para ela."""
+        caminho_pasta = os.path.join(diretorio_base, nome_pasta)
+        
+        # Cria pasta se não existir
+        if not os.path.exists(caminho_pasta):
+            os.makedirs(caminho_pasta)
+            print(f"   ✅ Pasta criada: {nome_pasta}")
+        
+        # Move imagens
+        for img in imagens:
+            origem = img.arquivo
+            nome_arquivo = os.path.basename(origem)
+            destino = os.path.join(caminho_pasta, nome_arquivo)
+            
+            try:
+                shutil.move(origem, destino)
+                # Atualiza o caminho da imagem
+                img.arquivo = destino
+            except Exception as e:
+                print(f"   ❌ Erro ao mover {nome_arquivo}: {e}")
+
     def detect_events_in_files(self, imagens: List[ImageInfo]) -> Dict[str, List[str]]:
         """
         Detecta eventos nos nomes dos arquivos já organizados.
