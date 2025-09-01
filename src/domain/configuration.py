@@ -45,14 +45,20 @@ class ProjectConfiguration:
         """
         Calcula o número do período baseado na data da foto.
         
-        Sistema de ano fiscal personalizado:
-        - Período 00: Do dia inicial até final do primeiro mês
-        - Períodos seguintes: Meses completos em sequência
+        Sistema de numeração baseado no dia inicial:
+        - Numeração começa com o dia do mês da data inicial
+        - Incrementa a cada mês subsequente
+        
+        Exemplo: Início 01/05/2025
+        - Maio 2025 = período 01 (dia inicial)
+        - Junho 2025 = período 02
+        - Julho 2025 = período 03
+        - etc.
         
         Exemplo: Início 08/03/2025
-        - 08/03 a 31/03/2025 = período 00
-        - 01/04 a 30/04/2025 = período 01  
-        - 01/05 a 31/05/2025 = período 02
+        - Março 2025 = período 08 (dia inicial)
+        - Abril 2025 = período 09
+        - Maio 2025 = período 10
         - etc.
         """
         if not self.incluir_periodo:
@@ -65,7 +71,8 @@ class ProjectConfiguration:
         anos_diff = data.year - self.data_inicio.year
         meses_diff = anos_diff * 12 + (data.month - self.data_inicio.month)
         
-        return meses_diff
+        # Começa com o dia da data inicial + meses decorridos
+        return self.data_inicio.day + meses_diff
     
     def calculate_year_number(self, data: datetime) -> int:
         """
