@@ -5,21 +5,10 @@ from typing import List
 
 from ..domain.image import ImageInfo
 
-
 class BackupManager:
-    """Responsável por criar backups das operações."""
     
     def create_backup(self, diretorio: str, operacao: str) -> str:
-        """
-        Cria um backup/log das operações realizadas.
         
-        Args:
-            diretorio: Diretório das imagens
-            operacao: Nome da operação sendo executada
-            
-        Returns:
-            Caminho do arquivo de backup criado
-        """
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         backup_dir = os.path.join(diretorio, "backups")
         

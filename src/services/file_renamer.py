@@ -8,15 +8,10 @@ from collections import defaultdict
 from ..domain.image import ImageInfo, Event
 from ..domain.configuration import ProjectConfiguration, ConfigurationManager
 
-
 class FilenameGenerator:
-    """Responsável por gerar nomes de arquivos seguindo padrão configurado."""
     
     def __init__(self, configuration: Optional[ProjectConfiguration] = None):
-        """
-        Inicializa com uma configuração específica.
-        Se não fornecida, usa configuração padrão.
-        """
+        
         if configuration is None:
             from datetime import datetime
             configuration = ConfigurationManager.create_custom_configuration(
@@ -32,19 +27,16 @@ class FilenameGenerator:
         numero_sequencial: int = 0,
         eventos: Optional[Dict[str, str]] = None
     ) -> str:
-        """
-        Gera um novo nome para o arquivo baseado na configuração.
-        """
+        
         data = info.data_preferencial
         
-        # Verifica se a data está no período configurado
         if not self.configuration.is_date_in_range(data):
-            # Para datas fora do período, usa apenas data e sequencial
+            
             nome_base = data.strftime(self.configuration.formato_data)
             if self.configuration.incluir_sequencial:
                 nome_base += f"({numero_sequencial:02d})"
         else:
-            # Gera nome usando a configuração
+            
             evento_str = None
             if eventos:
                 data_fmt = data.strftime('%d%m%Y')
@@ -57,16 +49,11 @@ class FilenameGenerator:
         return nome_base + info.extensao
     
     def is_organized(self, nome_arquivo: str) -> bool:
-        """
-        Verifica se o arquivo já segue algum padrão de organização.
-        Verifica tanto o padrão novo quanto o antigo (compatibilidade).
-        """
+        
         nome_sem_ext = Path(nome_arquivo).stem
         
-        # Padrão antigo: MM - IMG DDMMAAAA(XX)[- evento]
         padrao_antigo = r'^\d{2} - IMG \d{8}\(\d{2}\)(?:\s-\s.+)?$'
         
-        # Padrão novo genérico: qualquer coisa com data e sequencial
         padrao_novo = r'.*\d{8}\(\d{2}\)(?:\s-\s.+)?$'
         
         return (
@@ -74,9 +61,7 @@ class FilenameGenerator:
             bool(re.match(padrao_novo, nome_sem_ext))
         )
 
-
 class FileRenamer:
-    """Responsável por renomear arquivos."""
     
     def __init__(self):
         self.filename_generator = FilenameGenerator()
@@ -88,12 +73,7 @@ class FileRenamer:
         eventos: Optional[Dict[str, str]] = None,
         simular: bool = True
     ) -> int:
-        """
-        Renomeia as imagens de acordo com o formato especificado.
         
-        Returns:
-            Número de arquivos renomeados
-        """
         if simular:
             print("\n🔄 SIMULAÇÃO: Renomeando arquivos...")
         else:
@@ -138,7 +118,7 @@ class FileRenamer:
         return total_renomeados
     
     def _group_by_date(self, imagens: List[ImageInfo]) -> Dict[str, List[ImageInfo]]:
-        """Agrupa imagens por data."""
+        
         grupos: Dict[str, List[ImageInfo]] = {}
         for img in imagens:
             data = img.data_preferencial.strftime('%d%m%Y')

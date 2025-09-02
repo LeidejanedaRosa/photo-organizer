@@ -7,9 +7,7 @@ from pathlib import Path
 from ..domain.image import ImageInfo
 from ..domain.configuration import ProjectConfiguration
 
-
 class FolderOrganizer:
-    """Responsável por organizar imagens em pastas."""
     
     def organize_by_years(
         self,
@@ -17,12 +15,7 @@ class FolderOrganizer:
         diretorio: str,
         simular: bool = True
     ) -> Dict[int, List[ImageInfo]]:
-        """
-        Organiza imagens automaticamente por ano.
         
-        Returns:
-            Dicionário com ano -> lista de imagens
-        """
         if not imagens:
             return {}
         
@@ -90,12 +83,7 @@ class FolderOrganizer:
         eventos_detectados: Dict[str, List[str]],
         simular: bool = True
     ) -> int:
-        """
-        Organiza as fotos em pastas baseadas nos eventos detectados.
         
-        Returns:
-            Número de arquivos movidos
-        """
         if not eventos_detectados:
             print("📁 Nenhum evento detectado nos nomes dos arquivos.")
             return 0
@@ -154,17 +142,10 @@ class FolderOrganizer:
         configuration: ProjectConfiguration,
         simular: bool = True
     ) -> Dict[str, List[ImageInfo]]:
-        """
-        Organiza imagens por períodos customizados.
-        Cria pastas para períodos atual e futuros conforme necessário.
         
-        Returns:
-            Dicionário com pasta -> lista de imagens
-        """
         if not imagens:
             return {}
         
-        # Separa imagens por período
         imagens_periodo_atual = []
         imagens_periodo_futuro = []
         nova_config = None
@@ -188,7 +169,6 @@ class FolderOrganizer:
         
         print("─" * 70)
         
-        # Organiza período atual
         if imagens_periodo_atual:
             nome_pasta_atual = self._gerar_nome_pasta_periodo(configuration)
             resultado[nome_pasta_atual] = imagens_periodo_atual
@@ -202,7 +182,6 @@ class FolderOrganizer:
             
             print(f"📁 {nome_pasta_atual}: {len(imagens_periodo_atual)} imagens")
         
-        # Organiza período futuro (se houver)
         if imagens_periodo_futuro and nova_config:
             nome_pasta_futura = self._gerar_nome_pasta_periodo(nova_config)
             resultado[nome_pasta_futura] = imagens_periodo_futuro
@@ -225,7 +204,7 @@ class FolderOrganizer:
         return resultado
     
     def _gerar_nome_pasta_periodo(self, config: ProjectConfiguration) -> str:
-        """Gera nome da pasta baseado na configuração do período."""
+        
         inicio = config.data_inicio.strftime("%d-%m-%Y")
         if config.data_final:
             final = config.data_final.strftime("%d-%m-%Y")
@@ -241,15 +220,13 @@ class FolderOrganizer:
         diretorio_base: str,
         nome_pasta: str
     ) -> None:
-        """Cria pasta e move imagens para ela."""
+        
         caminho_pasta = os.path.join(diretorio_base, nome_pasta)
         
-        # Cria pasta se não existir
         if not os.path.exists(caminho_pasta):
             os.makedirs(caminho_pasta)
             print(f"   ✅ Pasta criada: {nome_pasta}")
         
-        # Move imagens
         for img in imagens:
             origem = img.arquivo
             nome_arquivo = os.path.basename(origem)
@@ -257,18 +234,13 @@ class FolderOrganizer:
             
             try:
                 shutil.move(origem, destino)
-                # Atualiza o caminho da imagem
+                
                 img.arquivo = destino
             except Exception as e:
                 print(f"   ❌ Erro ao mover {nome_arquivo}: {e}")
 
     def detect_events_in_files(self, imagens: List[ImageInfo]) -> Dict[str, List[str]]:
-        """
-        Detecta eventos nos nomes dos arquivos já organizados.
         
-        Returns:
-            Dicionário com evento -> lista de arquivos
-        """
         eventos_detectados = defaultdict(list)
         
         for img in imagens:
@@ -283,7 +255,7 @@ class FolderOrganizer:
         return dict(eventos_detectados)
     
     def _is_organized(self, nome_arquivo: str) -> bool:
-        """Verifica se o arquivo já está organizado."""
+        
         from .file_renamer import FilenameGenerator
         generator = FilenameGenerator()
         return generator.is_organized(nome_arquivo)

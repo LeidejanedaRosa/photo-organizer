@@ -7,20 +7,10 @@ from PIL.ExifTags import TAGS
 
 from ..domain.image import ImageInfo
 
-
 class ImageAnalyzer:
-    """Responsável por analisar imagens e extrair metadados."""
     
     def analyze_image(self, caminho: str) -> Optional[ImageInfo]:
-        """
-        Analisa uma imagem e retorna suas informações.
         
-        Args:
-            caminho: Caminho para o arquivo de imagem
-            
-        Returns:
-            ImageInfo ou None se não foi possível analisar
-        """
         try:
             with Image.open(caminho) as img:
                 data_mod = datetime.fromtimestamp(os.path.getmtime(caminho))
@@ -42,7 +32,7 @@ class ImageAnalyzer:
             return None
     
     def _extract_exif_date(self, img: Image.Image) -> Optional[datetime]:
-        """Extrai a data EXIF da imagem."""
+        
         try:
             exif = img.getexif()
             if exif is not None:
@@ -56,7 +46,7 @@ class ImageAnalyzer:
         return None
     
     def _calculate_image_hash(self, caminho: str) -> str:
-        """Calcula o hash MD5 do conteúdo da imagem."""
+        
         hasher = hashlib.md5()
         try:
             with Image.open(caminho) as img:
@@ -70,15 +60,7 @@ class ImageAnalyzer:
         return hasher.hexdigest()
     
     def analyze_directory(self, diretorio: str) -> List[ImageInfo]:
-        """
-        Analisa todas as imagens em um diretório.
         
-        Args:
-            diretorio: Caminho do diretório
-            
-        Returns:
-            Lista de ImageInfo das imagens encontradas
-        """
         imagens = []
         
         for arquivo in os.listdir(diretorio):

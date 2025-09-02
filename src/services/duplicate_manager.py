@@ -5,20 +5,10 @@ from collections import defaultdict
 
 from ..domain.image import ImageInfo
 
-
 class DuplicateManager:
-    """Responsável por detectar e gerenciar imagens duplicadas."""
     
     def find_duplicates(self, imagens: List[ImageInfo]) -> Dict[str, List[ImageInfo]]:
-        """
-        Encontra imagens duplicadas baseado em seu hash.
         
-        Args:
-            imagens: Lista de ImageInfo
-            
-        Returns:
-            Dicionário com hash -> lista de imagens duplicadas
-        """
         grupos_hash: Dict[str, List[ImageInfo]] = defaultdict(list)
         
         for img in imagens:
@@ -37,17 +27,7 @@ class DuplicateManager:
         diretorio_origem: str,
         simular: bool = True
     ) -> int:
-        """
-        Move as imagens duplicadas para uma pasta específica.
         
-        Args:
-            duplicadas: Dicionário de duplicatas
-            diretorio_origem: Diretório de origem
-            simular: Se True, apenas simula a operação
-            
-        Returns:
-            Número de arquivos movidos
-        """
         if not duplicadas:
             print("✅ Nenhuma imagem duplicada encontrada!")
             return 0

@@ -9,12 +9,7 @@ from .folder_organizer import FolderOrganizer
 from .backup_manager import BackupManager
 from .report_generator import ReportGenerator
 
-
 class PhotoOrganizerService:
-    """
-    Serviço principal que orquestra operações de organização de fotos.
-    Segue o princípio Single Responsibility.
-    """
     
     def __init__(self, configuration: Optional[ProjectConfiguration] = None):
         self.configuration = configuration
@@ -27,17 +22,12 @@ class PhotoOrganizerService:
         self.filename_generator = FilenameGenerator(configuration)
     
     def set_configuration(self, configuration: ProjectConfiguration) -> None:
-        """Define uma nova configuração para o serviço."""
+        
         self.configuration = configuration
         self.filename_generator = FilenameGenerator(configuration)
     
     def analyze_directory(self, diretorio: str) -> tuple[List[ImageInfo], List[ImageInfo]]:
-        """
-        Analisa um diretório e separa imagens organizadas das não organizadas.
         
-        Returns:
-            Tupla (imagens_não_organizadas, imagens_organizadas)
-        """
         todas_imagens = self.image_analyzer.analyze_directory(diretorio)
         
         imagens_organizadas = []
@@ -49,7 +39,6 @@ class PhotoOrganizerService:
             else:
                 imagens_nao_organizadas.append(img)
         
-        # Ordena por data
         key_func = lambda x: x.data_preferencial
         imagens_organizadas.sort(key=key_func)
         imagens_nao_organizadas.sort(key=key_func)
@@ -62,7 +51,7 @@ class PhotoOrganizerService:
         diretorio: str, 
         simular: bool = True
     ) -> int:
-        """Detecta e move duplicatas."""
+        
         duplicadas = self.duplicate_manager.find_duplicates(imagens)
         if duplicadas and not simular:
             backup_file = self.backup_manager.create_backup(diretorio, "mover_duplicatas")
@@ -77,7 +66,7 @@ class PhotoOrganizerService:
         eventos: Optional[Dict[str, str]] = None,
         simular: bool = True
     ) -> int:
-        """Renomeia imagens seguindo o padrão estabelecido."""
+        
         if not simular and imagens:
             backup_file = self.backup_manager.create_backup(diretorio, "renomear_imagens")
             print(f"💾 Backup criado: {backup_file}")
@@ -90,7 +79,7 @@ class PhotoOrganizerService:
         diretorio: str, 
         simular: bool = True
     ) -> Dict[int, List[ImageInfo]]:
-        """Organiza imagens por anos do bebê."""
+        
         if not simular and imagens:
             backup_file = self.backup_manager.create_backup(diretorio, "organizar_anos")
             print(f"💾 Backup criado: {backup_file}")
@@ -103,7 +92,7 @@ class PhotoOrganizerService:
         diretorio: str, 
         simular: bool = True
     ) -> int:
-        """Organiza imagens por eventos detectados."""
+        
         eventos_detectados = self.folder_organizer.detect_events_in_files(imagens)
         
         if not simular and eventos_detectados:
@@ -119,7 +108,7 @@ class PhotoOrganizerService:
         configuracao: 'ProjectConfiguration',
         simular: bool = True
     ) -> Dict[str, List[ImageInfo]]:
-        """Organiza imagens por períodos personalizados."""
+        
         if not simular and imagens:
             backup_file = self.backup_manager.create_backup(
                 diretorio, "organizar_periodos")
@@ -129,7 +118,7 @@ class PhotoOrganizerService:
             imagens, diretorio, configuracao, simular)
 
     def generate_report(self, imagens: List[ImageInfo]) -> None:
-        """Gera relatório detalhado das imagens."""
+        
         self.report_generator.generate_detailed_report(imagens)
     
     def search_photos_by_period(
@@ -138,12 +127,12 @@ class PhotoOrganizerService:
         data_inicio: str,
         data_fim: str
     ) -> List[ImageInfo]:
-        """Busca fotos por período."""
+        
         return self.report_generator.search_photos_by_period(
             imagens, data_inicio, data_fim)
     
     def create_manual_backup(self, diretorio: str) -> str:
-        """Cria backup manual."""
+        
         return self.backup_manager.create_backup(diretorio, "backup_manual")
     
     def print_analysis_statistics(
@@ -151,7 +140,7 @@ class PhotoOrganizerService:
         imagens_nao_organizadas: List[ImageInfo],
         imagens_organizadas: List[ImageInfo]
     ) -> None:
-        """Imprime estatísticas da análise."""
+        
         total_imagens = len(imagens_nao_organizadas) + len(imagens_organizadas)
         
         print("\n📊 ESTATÍSTICAS:")
@@ -172,7 +161,6 @@ class PhotoOrganizerService:
         self._print_image_details(imagens_nao_organizadas)
     
     def _print_image_details(self, imagens: List[ImageInfo]) -> None:
-        """Imprime detalhes das imagens."""
         
         for img in imagens:
             data = img.data_preferencial

@@ -1,13 +1,11 @@
 from datetime import datetime
 from typing import Dict
 
-
 class EventManager:
-    """Responsável por gerenciar eventos de fotos."""
     
     @staticmethod
     def solicitar_eventos() -> Dict[str, str]:
-        """Solicita ao usuário informações sobre eventos nas fotos."""
+        
         eventos = {}
         print("\n" + "─" * 50)
         print("🎉 CONFIGURAÇÃO DE EVENTOS")

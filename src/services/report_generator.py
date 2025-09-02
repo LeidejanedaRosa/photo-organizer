@@ -4,12 +4,10 @@ from collections import defaultdict
 
 from ..domain.image import ImageInfo
 
-
 class ReportGenerator:
-    """Responsável por gerar relatórios detalhados das imagens."""
     
     def generate_detailed_report(self, imagens: List[ImageInfo]) -> None:
-        """Gera um relatório detalhado das imagens analisadas."""
+        
         if not imagens:
             print("📋 Nenhuma imagem para analisar no relatório.")
             return
@@ -18,11 +16,9 @@ class ReportGenerator:
         print("📊 RELATÓRIO DETALHADO DAS IMAGENS")
         print("=" * 70)
         
-        # Estatísticas gerais
         total_imagens = len(imagens)
         total_tamanho = sum(img.tamanho for img in imagens)
         
-        # Análises específicas
         self._analyze_formats(imagens, total_imagens)
         self._analyze_dimensions(imagens, total_imagens)
         self._analyze_temporal_data(imagens, total_imagens, total_tamanho)
@@ -30,7 +26,7 @@ class ReportGenerator:
         print("=" * 70)
     
     def _analyze_formats(self, imagens: List[ImageInfo], total: int) -> None:
-        """Analisa distribuição por formato."""
+        
         formatos = defaultdict(int)
         tamanhos_por_formato = defaultdict(int)
         
@@ -48,7 +44,7 @@ class ReportGenerator:
             )
     
     def _analyze_dimensions(self, imagens: List[ImageInfo], total: int) -> None:
-        """Analisa distribuição por dimensões."""
+        
         dimensoes = defaultdict(int)
         
         for img in imagens:
@@ -69,7 +65,7 @@ class ReportGenerator:
         total: int, 
         total_tamanho: int
     ) -> None:
-        """Analisa dados temporais das imagens."""
+        
         print("\n📈 ESTATÍSTICAS GERAIS:")
         print(f"   📷 Total de imagens: {total}")
         print(f"   💾 Tamanho total: {total_tamanho / (1024*1024):.2f} MB")
@@ -102,10 +98,7 @@ class ReportGenerator:
         data_inicio: str,
         data_fim: str
     ) -> List[ImageInfo]:
-        """
-        Busca fotos em um período específico.
-        Formato das datas: DD/MM/AAAA
-        """
+        
         try:
             inicio = datetime.strptime(data_inicio, '%d/%m/%Y')
             fim = datetime.strptime(data_fim, '%d/%m/%Y')
