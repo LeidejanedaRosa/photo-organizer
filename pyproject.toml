@@ -30,8 +30,15 @@ force_grid_wrap = 0
 use_parentheses = true
 ensure_newline_before_comments = true
 
+[tool.pylint.messages_control]
+disable = ["missing-docstring", "too-few-public-methods"]
+enable = ["unused-import", "unused-variable", "unused-argument"]
+
+[tool.pylint.format]
+max-line-length = 79
+
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.9"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
