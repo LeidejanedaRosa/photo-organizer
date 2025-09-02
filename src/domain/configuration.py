@@ -70,9 +70,7 @@ class ProjectConfiguration:
             return True
         return False
 
-    def suggest_new_period_config(
-        self
-    ) -> "ProjectConfiguration":
+    def suggest_new_period_config(self) -> "ProjectConfiguration":
 
         if not self.end_date:
             raise ValueError(

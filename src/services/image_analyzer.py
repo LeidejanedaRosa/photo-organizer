@@ -3,9 +3,7 @@ import os
 from datetime import datetime
 from typing import List, Optional
 
-from PIL import Image, ExifTags
-# from PIL import 
-# from PIL.ExifTags import TAGS
+from PIL import ExifTags, Image
 
 from src.domain.image import ImageInfo
 
@@ -43,7 +41,9 @@ class ImageAnalyzer:
                     tag = ExifTags.TAGS.get(tag_id, tag_id)
                     date = exif.get(tag_id)
                     if tag == "DateTimeOriginal" and date:
-                        return datetime.strptime(str(date), "%Y:%m:%d %H:%M:%S")
+                        return datetime.strptime(
+                            str(date), "%Y:%m:%d %H:%M:%S"
+                        )
         except (AttributeError, ValueError, TypeError):
             return None
         return None

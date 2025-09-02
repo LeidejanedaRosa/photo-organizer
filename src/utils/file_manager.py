@@ -48,7 +48,10 @@ class FileManager:
 
     @staticmethod
     def move_single_file(
-        source_path: str, target_path: str, filename: str, simulate: bool = True
+        source_path: str,
+        target_path: str,
+        filename: str,
+        simulate: bool = True,
     ) -> bool:
 
         if simulate:

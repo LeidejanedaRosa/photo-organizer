@@ -43,7 +43,9 @@ class DuplicateManager:
 
         duplicate_folders = os.path.join(origin_directory, "duplicadas")
 
-        self.ui_formatter.print_operation_header("Movendo duplicatas", simulate)
+        self.ui_formatter.print_operation_header(
+            "Movendo duplicatas", simulate
+        )
         self.ui_formatter.print_separator()
 
         total_moved = 0

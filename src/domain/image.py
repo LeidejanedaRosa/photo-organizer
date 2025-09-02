@@ -45,8 +45,7 @@ class ImageInfo:
         if not isinstance(other, ImageInfo):
             return False
         return (
-            self.hash_image == other.hash_image
-            and self.hash_image is not None
+            self.hash_image == other.hash_image and self.hash_image is not None
         )
 
     def __hash__(self):

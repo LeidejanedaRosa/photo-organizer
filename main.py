@@ -1,7 +1,7 @@
 from src.cli.photo_organizer_cli import PhotoOrganizerCLI
 
 
-def main():
+def main() -> None:
     app = PhotoOrganizerCLI()
     app.run()
 
