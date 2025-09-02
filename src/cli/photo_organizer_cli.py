@@ -15,19 +15,19 @@ class PhotoOrganizerCLI:
     
     def run(self) -> None:
         try:
-            diretorio = self.menu.solicitar_diretorio()
+            directory = self.menu.request_directory()
             
-            imagens_nao_org, imagens_org = self.service.analyze_directory(diretorio)
-            tem_fotos_organizadas = len(imagens_org) > 0
-            tem_configuracao = self.configuration is not None
+            unorganized_images, organized_images = self.service.analyze_directory(directory)
+            has_organized_photos = len(organized_images) > 0
+            has_configuration = self.configuration is not None
             
-            opcao = self.menu.exibir_menu_inteligente(
-                tem_fotos_organizadas, tem_configuracao
+            option = self.menu.display_smart_menu(
+                has_organized_photos, has_configuration
             )
             
-            self._executar_opcao_inteligente(
-                opcao, diretorio, imagens_nao_org, imagens_org,
-                tem_fotos_organizadas, tem_configuracao
+            self._execute_smart_option(
+                option, directory, unorganized_images, organized_images,
+                has_organized_photos, has_configuration
             )
         except KeyboardInterrupt:
             print("\n\n👋 Programa encerrado pelo usuário.")
@@ -35,98 +35,98 @@ class PhotoOrganizerCLI:
             print(f"\n❌ Erro inesperado: {e}")
             print("🔧 Verifique o diretório e tente novamente.")
     
-    def _executar_opcao_inteligente(
+    def _execute_smart_option(
         self,
-        opcao: int,
-        diretorio: str,
-        imagens_nao_org: List[ImageInfo],
-        imagens_org: List[ImageInfo],
-        tem_fotos_organizadas: bool,
-        tem_configuracao: bool
+        option: int,
+        directory: str,
+        unorganized_images: List[ImageInfo],
+        organized_images: List[ImageInfo],
+        has_organized_photos: bool,
+        has_configuration: bool
     ) -> None:
-        self.menu.imprimir_separador()
+        self.menu.print_separator()
         
         if self.configuration:
             self.service.set_configuration(self.configuration)
         
-        todas_imagens = imagens_nao_org + imagens_org
+        all_images = unorganized_images + organized_images
         
-        if not tem_fotos_organizadas:
-            if opcao == 1:
-                self._opcao_configuracao_personalizada()
-            elif opcao == 2:
-                self._opcao_duplicatas(todas_imagens, diretorio)
-            elif opcao == 3:
-                self._opcao_renomear(imagens_nao_org, diretorio)
-            elif opcao == 4:
-                self._opcao_processo_completo(
-                    imagens_nao_org, imagens_org, diretorio
+        if not has_organized_photos:
+            if option == 1:
+                self._option_custom_configuration()
+            elif option == 2:
+                self._option_duplicates(all_images, directory)
+            elif option == 3:
+                self._option_rename(unorganized_images, directory)
+            elif option == 4:
+                self._option_complete_process(
+                    unorganized_images, organized_images, directory
                 )
-            elif opcao == 5:
-                self._opcao_relatorio(todas_imagens)
+            elif option == 5:
+                self._option_report(all_images)
         else:
-            if opcao == 1:
-                self._opcao_configuracao_personalizada()
-            elif opcao == 2:
-                self._opcao_duplicatas(todas_imagens, diretorio)
-            elif opcao == 3:
-                self._opcao_renomear(imagens_nao_org, diretorio)
-            elif opcao == 4:
-                self._opcao_processo_completo(
-                    imagens_nao_org, imagens_org, diretorio
+            if option == 1:
+                self._option_custom_configuration()
+            elif option == 2:
+                self._option_duplicates(all_images, directory)
+            elif option == 3:
+                self._option_rename(unorganized_images, directory)
+            elif option == 4:
+                self._option_complete_process(
+                    unorganized_images, organized_images, directory
                 )
-            elif opcao == 5:
-                self._opcao_organizar_eventos(todas_imagens, diretorio)
-            elif opcao == 6:
-                self._opcao_organizar_periodos_customizados(
-                    todas_imagens, diretorio
+            elif option == 5:
+                self._option_organize_events(all_images, directory)
+            elif option == 6:
+                self._option_organize_custom_periods(
+                    all_images, directory
                 )
-            elif opcao == 7:
-                self._opcao_buscar_periodo(todas_imagens)
-            elif opcao == 8:
-                self._opcao_relatorio(todas_imagens)
-            elif opcao == 9:
-                self._opcao_backup_manual(diretorio, todas_imagens)
+            elif option == 7:
+                self._option_search_period(all_images)
+            elif option == 8:
+                self._option_report(all_images)
+            elif option == 9:
+                self._option_manual_backup(directory, all_images)
         
-        self.menu.imprimir_conclusao()
+        self.menu.print_conclusion()
     
-    def _executar_opcao_legado(self, opcao: int, diretorio: str) -> None:
-        self.menu.imprimir_separador()
+    def _execute_legacy_option(self, option: int, directory: str) -> None:
+        self.menu.print_separator()
         
-        if opcao == 9:
-            self._opcao_configuracao_personalizada()
+        if option == 9:
+            self._option_custom_configuration()
             return
         
         if self.configuration:
             self.service.set_configuration(self.configuration)
         
-        imagens_nao_org, imagens_org = self.service.analyze_directory(diretorio)
-        todas_imagens = imagens_nao_org + imagens_org
+        unorganized_images, organized_images = self.service.analyze_directory(directory)
+        all_images = unorganized_images + organized_images
         
-        if opcao == 1:
-            self._opcao_duplicatas(todas_imagens, diretorio)
-        elif opcao == 2:
-            self._opcao_renomear(imagens_nao_org, diretorio)
-        elif opcao == 3:
-            self._opcao_processo_completo(
-                imagens_nao_org, imagens_org, diretorio
+        if option == 1:
+            self._option_duplicates(all_images, directory)
+        elif option == 2:
+            self._option_rename(unorganized_images, directory)
+        elif option == 3:
+            self._option_complete_process(
+                unorganized_images, organized_images, directory
             )
-        elif opcao == 4:
-            self._opcao_relatorio(todas_imagens)
-        elif opcao == 5:
-            self._opcao_buscar_periodo(todas_imagens)
-        elif opcao == 6:
-            self._opcao_organizar_eventos(todas_imagens, diretorio)
-        elif opcao == 7:
-            self._opcao_organizar_periodos_customizados(
-                todas_imagens, diretorio
+        elif option == 4:
+            self._option_report(all_images)
+        elif option == 5:
+            self._option_search_period(all_images)
+        elif option == 6:
+            self._option_organize_events(all_images, directory)
+        elif option == 7:
+            self._option_organize_custom_periods(
+                all_images, directory
             )
-        elif opcao == 8:
-            self._opcao_backup_manual(diretorio, todas_imagens)
+        elif option == 8:
+            self._option_manual_backup(directory, all_images)
         
-        self.menu.imprimir_conclusao()
+        self.menu.print_conclusion()
     
-    def _orientar_configuracao_nomenclatura(self) -> None:
+    def _guide_naming_configuration(self) -> None:
         print("\n" + "⚠️ " * 20)
         print("⚠️  CONFIGURAÇÃO DE NOMENCLATURA NECESSÁRIA")
         print("⚠️ " * 20)
@@ -146,7 +146,7 @@ class PhotoOrganizerCLI:
         print()
         print("=" * 60)
         
-        if self.menu.confirmar_operacao("Deseja configurar agora?"):
+        if self.menu.confirm_operation("Deseja configurar agora?"):
             self.configuration = (
                 ConfigurationManager.prompt_user_configuration()
             )
@@ -157,141 +157,141 @@ class PhotoOrganizerCLI:
         else:
             print("👋 Use a opção 9 quando estiver pronto para configurar.")
 
-    def _opcao_duplicatas(
-        self, imagens: List[ImageInfo], diretorio: str
+    def _option_duplicates(
+        self, images: List[ImageInfo], directory: str
     ) -> None:
         print("🔍 DETECTANDO E MOVENDO DUPLICATAS...")
         
-        movidas = self.service.detect_and_move_duplicates(imagens, diretorio, simular=True)
+        moved = self.service.detect_and_move_duplicates(images, directory, simular=True)
         
-        if movidas > 0 and self.menu.confirmar_operacao("Confirma mover duplicatas?"):
-            self.service.detect_and_move_duplicates(imagens, diretorio, simular=False)
-        elif movidas == 0:
-            print("✅ Nenhuma duplicata encontrada!")
+        if moved > 0 and self.menu.confirm_operation("Confirma mover duplicatas?"):
+            self.service.detect_and_move_duplicates(images, directory, simular=False)
+        elif moved == 0:
+            print("✅ Nenhuma duplicate encontrada!")
     
-    def _opcao_renomear(self, imagens: List[ImageInfo], diretorio: str) -> None:
+    def _option_rename(self, images: List[ImageInfo], directory: str) -> None:
         print("📝 RENOMEANDO IMAGENS...")
         
-        if not imagens:
+        if not images:
             print("✅ Nenhuma imagem precisa ser renomeada!")
             return
         
         if not self.configuration:
-            self._orientar_configuracao_nomenclatura()
+            self._guide_naming_configuration()
             return
         
-        eventos = {}
-        if self.menu.confirmar_operacao(
-            "Deseja configurar eventos especiais para as fotos?"
+        events = {}
+        if self.menu.confirm_operation(
+            "Deseja configurar events especiais para as fotos?"
         ):
-            eventos = EventManager.solicitar_eventos()
+            events = EventManager.request_events()
         
-        self.service.rename_images(imagens, diretorio, eventos, simular=True)
+        self.service.rename_images(images, directory, events, simular=True)
         
-        if self.menu.confirmar_operacao("Confirma as alterações?"):
+        if self.menu.confirm_operation("Confirma as alterações?"):
             self.service.rename_images(
-                imagens, diretorio, eventos, simular=False
+                images, directory, events, simular=False
             )
             
-            if eventos:
-                self._oferecer_organizacao_pos_renomeacao(diretorio)
+            if events:
+                self._offer_post_rename_organization(directory)
     
-    def _opcao_processo_completo(
+    def _option_complete_process(
         self,
-        imagens_nao_org: List[ImageInfo],
-        imagens_org: List[ImageInfo],
-        diretorio: str
+        unorganized_images: List[ImageInfo],
+        organized_images: List[ImageInfo],
+        directory: str
     ) -> None:
         
         print("🚀 EXECUTANDO PROCESSO COMPLETO...")
         
-        self.service.print_analysis_statistics(imagens_nao_org, imagens_org)
+        self.service.print_analysis_statistics(unorganized_images, organized_images)
         
-        todas_imagens = imagens_nao_org + imagens_org
+        all_images = unorganized_images + organized_images
         
-        duplicatas_movidas = self.service.detect_and_move_duplicates(
-            todas_imagens, diretorio, simular=True
+        moved_duplicates = self.service.detect_and_move_duplicates(
+            all_images, directory, simular=True
         )
-        if duplicatas_movidas > 0 and self.menu.confirmar_operacao(
+        if moved_duplicates > 0 and self.menu.confirm_operation(
             "Mover duplicatas?"
         ):
             self.service.detect_and_move_duplicates(
-                todas_imagens, diretorio, simular=False
+                all_images, directory, simular=False
             )
         
-        if imagens_nao_org:
+        if unorganized_images:
             if not self.configuration:
-                self._orientar_configuracao_nomenclatura()
+                self._guide_naming_configuration()
                 return
                 
-            eventos = {}
-            if self.menu.confirmar_operacao(
-                "Deseja configurar eventos especiais para as fotos?"
+            events = {}
+            if self.menu.confirm_operation(
+                "Deseja configurar events especiais para as fotos?"
             ):
-                eventos = EventManager.solicitar_eventos()
+                events = EventManager.request_events()
                 
             self.service.rename_images(
-                imagens_nao_org, diretorio, eventos, simular=True
+                unorganized_images, directory, events, simular=True
             )
             
-            if self.menu.confirmar_operacao("Confirma renomeação?"):
+            if self.menu.confirm_operation("Confirma renomeação?"):
                 self.service.rename_images(
-                    imagens_nao_org, diretorio, eventos, simular=False
+                    unorganized_images, directory, events, simular=False
                 )
     
-    def _opcao_relatorio(self, imagens: List[ImageInfo]) -> None:
+    def _option_report(self, images: List[ImageInfo]) -> None:
         
         print("📊 GERANDO RELATÓRIO DETALHADO...")
-        self.service.generate_report(imagens)
+        self.service.generate_report(images)
     
-    def _opcao_buscar_periodo(self, imagens: List[ImageInfo]) -> None:
+    def _option_search_period(self, images: List[ImageInfo]) -> None:
         
         print("🔍 BUSCAR FOTOS POR PERÍODO...")
-        data_inicio, data_fim = self.menu.solicitar_periodo()
+        start_date, end_date = self.menu.request_period()
         
-        fotos_periodo = self.service.search_photos_by_period(imagens, data_inicio, data_fim)
+        period_photos = self.service.search_photos_by_period(images, start_date, end_date)
         
-        if fotos_periodo:
-            print(f"\n📋 ENCONTRADAS {len(fotos_periodo)} FOTOS NO PERÍODO:")
+        if period_photos:
+            print(f"\n📋 ENCONTRADAS {len(period_photos)} FOTOS NO PERÍODO:")
             print("─" * 50)
-            for img in fotos_periodo:
-                data = img.data_preferencial
-                print(f"📷 {img.arquivo}")
-                print(f"   📅 Data: {data.strftime('%d/%m/%Y %H:%M')}")
-                print(f"   📏 Dimensões: {img.dimensoes}")
+            for img in period_photos:
+                date = img.preferred_date
+                print(f"📷 {img.file}")
+                print(f"   📅 Data: {date.strftime('%d/%m/%Y %H:%M')}")
+                print(f"   📏 Dimensões: {img.dimensions}")
                 print()
         else:
             print("❌ Nenhuma foto encontrada no período especificado.")
     
-    def _opcao_organizar_eventos(self, imagens: List[ImageInfo], diretorio: str) -> None:
+    def _option_organize_events(self, images: List[ImageInfo], directory: str) -> None:
         
         print("📁 ORGANIZANDO POR PASTAS DE EVENTOS...")
         
-        movidos = self.service.organize_by_events(imagens, diretorio, simular=True)
+        moved = self.service.organize_by_events(images, directory, simular=True)
         
-        if movidos > 0 and self.menu.confirmar_operacao("Confirma a organização por pastas?"):
-            self.service.organize_by_events(imagens, diretorio, simular=False)
-        elif movidos == 0:
+        if moved > 0 and self.menu.confirm_operation("Confirma a organização por pastas?"):
+            self.service.organize_by_events(images, directory, simular=False)
+        elif moved == 0:
             print("📋 Nenhum evento detectado nos nomes dos arquivos.")
-            print("💡 Dica: Adicione eventos aos nomes usando a opção de renomeação.")
+            print("💡 Dica: Adicione events aos nomes usando a opção de renomeação.")
     
-    def _opcao_organizar_anos(self, imagens: List[ImageInfo], diretorio: str) -> None:
+    def _option_organize_years(self, images: List[ImageInfo], directory: str) -> None:
         
         print("🎂 ORGANIZANDO POR ANOS (SISTEMA LEGADO)...")
         print("💡 Esta opção mantém compatibilidade com sistema anterior")
         
-        anos_dict = self.service.organize_by_years(imagens, diretorio, simular=True)
+        years_dict = self.service.organize_by_years(images, directory, simular=True)
         
-        if anos_dict and self.menu.confirmar_operacao("Confirma a organização por anos?"):
-            self.service.organize_by_years(imagens, diretorio, simular=False)
-        elif not anos_dict:
-            print("📅 Nenhuma imagem com data válida para organização por anos.")
-            print("💡 As imagens devem ter datas a partir de 01/01/2025.")
+        if years_dict and self.menu.confirm_operation("Confirma a organização por anos?"):
+            self.service.organize_by_years(images, directory, simular=False)
+        elif not years_dict:
+            print("📅 Nenhuma imagem com date válida para organização por anos.")
+            print("💡 As images devem ter datas a partir de 01/01/2025.")
     
-    def _opcao_organizar_periodos_customizados(
+    def _option_organize_custom_periods(
         self, 
-        imagens: List[ImageInfo], 
-        diretorio: str
+        images: List[ImageInfo], 
+        directory: str
     ) -> None:
         
         print("📊 ORGANIZANDO POR PERÍODOS CUSTOMIZADOS...")
@@ -301,30 +301,30 @@ class PhotoOrganizerCLI:
             print("💡 Use a opção 9 para configurar primeiro.")
             return
         
-        print(f"📅 Período configurado: {self.configuration.data_inicio.strftime('%d/%m/%Y')}")
-        if self.configuration.data_final:
-            print(f"📅 Data final: {self.configuration.data_final.strftime('%d/%m/%Y')}")
-        print(f"🏷️  Prefixo: {self.configuration.prefixo_nomenclatura}")
+        print(f"📅 Período configurado: {self.configuration.start_date.strftime('%d/%m/%Y')}")
+        if self.configuration.end_date:
+            print(f"📅 Data final: {self.configuration.end_date.strftime('%d/%m/%Y')}")
+        print(f"🏷️  Prefixo: {self.configuration.naming_prefix}")
         
         print("\n🔍 Simulando organização...")
-        resultado = self.service.organize_by_custom_periods(
-            imagens, diretorio, self.configuration, simular=True)
+        result = self.service.organize_by_custom_periods(
+            images, directory, self.configuration, simular=True)
         
-        if not resultado:
+        if not result:
             print("ℹ️  Nenhuma organização necessária.")
             return
         
         print("\n📊 Resultado da simulação:")
-        for periodo, imgs in resultado.items():
-            print(f"  📁 {periodo}: {len(imgs)} imagens")
+        for period, imgs in result.items():
+            print(f"  📁 {period}: {len(imgs)} images")
         
-        if self.menu.confirmar_operacao("Executar organização por períodos?"):
+        if self.menu.confirm_operation("Executar organização por períodos?"):
             print("\n� Executando organização...")
             self.service.organize_by_custom_periods(
-                imagens, diretorio, self.configuration, simular=False)
+                images, directory, self.configuration, simular=False)
             print("✅ Organização concluída!")
     
-    def _opcao_configuracao_personalizada(self) -> None:
+    def _option_custom_configuration(self) -> None:
         
         print("⚙️  CONFIGURAÇÃO PERSONALIZADA")
         print("=" * 50)
@@ -334,21 +334,21 @@ class PhotoOrganizerCLI:
             "2️⃣  Visualizar configuração atual"
         ]
         
-        for opcao in opcoes:
-            print(f"   {opcao}")
+        for option in opcoes:
+            print(f"   {option}")
         
-        escolha = input("\n🔢 Escolha uma opção (1-2): ").strip()
+        choice = input("\n🔢 Escolha uma opção (1-2): ").strip()
         
-        if escolha == "1":
+        if choice == "1":
             self.configuration = ConfigurationManager.prompt_user_configuration()
             self.service.set_configuration(self.configuration)
             print("✅ Configuração personalizada aplicada!")
-        elif escolha == "2":
-            self._exibir_configuracao_atual()
+        elif choice == "2":
+            self._display_current_configuration()
         else:
             print("❌ Opção inválida!")
     
-    def _exibir_configuracao_atual(self) -> None:
+    def _display_current_configuration(self) -> None:
         
         if not self.configuration:
             print("⚠️  Nenhuma configuração personalizada definida.")
@@ -357,34 +357,34 @@ class PhotoOrganizerCLI:
         
         print("\n📋 CONFIGURAÇÃO ATUAL:")
         print("=" * 40)
-        print(f"📅 Data início: {self.configuration.data_inicio.strftime('%d/%m/%Y')}")
-        if self.configuration.data_final:
-            print(f"📅 Data final: {self.configuration.data_final.strftime('%d/%m/%Y')}")
+        print(f"📅 Data início: {self.configuration.start_date.strftime('%d/%m/%Y')}")
+        if self.configuration.end_date:
+            print(f"📅 Data final: {self.configuration.end_date.strftime('%d/%m/%Y')}")
         else:
             print("📅 Data final: Não definida")
-        print(f"🏷️  Prefixo: {self.configuration.prefixo_nomenclatura}")
-        print(f"📊 Período: {'Incluído' if self.configuration.incluir_periodo else 'Não incluído'}")
-        print(f"🔢 Sequencial: {'Incluído' if self.configuration.incluir_sequencial else 'Não incluído'}")
-        print(f"📝 Formato data: {self.configuration.formato_data}")
+        print(f"🏷️  Prefixo: {self.configuration.naming_prefix}")
+        print(f"📊 Período: {'Incluído' if self.configuration.include_period else 'Não incluído'}")
+        print(f"🔢 Sequencial: {'Incluído' if self.configuration.include_sequential else 'Não incluído'}")
+        print(f"📝 Formato date: {self.configuration.date_format}")
         print("=" * 40)
     
-    def _opcao_backup_manual(self, diretorio: str, imagens: List[ImageInfo]) -> None:
+    def _option_manual_backup(self, directory: str, images: List[ImageInfo]) -> None:
         
         print("💾 CRIANDO BACKUP DO ESTADO ATUAL...")
-        backup_file = self.service.create_manual_backup(diretorio)
+        backup_file = self.service.create_manual_backup(directory)
         print("✅ Backup criado com sucesso!")
         print(f"📁 Arquivo: {backup_file}")
-        print(f"📊 {len(imagens)} imagens registradas no backup.")
+        print(f"📊 {len(images)} images registradas no backup.")
     
-    def _oferecer_organizacao_pos_renomeacao(self, diretorio: str) -> None:
+    def _offer_post_rename_organization(self, directory: str) -> None:
         
         print("\n🎉 EVENTOS DETECTADOS NA RENOMEAÇÃO!")
         print("💡 Quer organizar as fotos em pastas por evento?")
         
-        if self.menu.confirmar_operacao("Organizar por pastas de eventos?"):
-            imagens_atualizadas, _ = self.service.analyze_directory(diretorio)
-            todas_atualizadas = imagens_atualizadas  
+        if self.menu.confirm_operation("Organizar por pastas de events?"):
+            updated_images, _ = self.service.analyze_directory(directory)
+            all_updated = updated_images  
             
-            movidos = self.service.organize_by_events(todas_atualizadas, diretorio, simular=True)
-            if movidos > 0 and self.menu.confirmar_operacao("Confirma a organização?"):
-                self.service.organize_by_events(todas_atualizadas, diretorio, simular=False)
+            moved = self.service.organize_by_events(all_updated, directory, simular=True)
+            if moved > 0 and self.menu.confirm_operation("Confirma a organização?"):
+                self.service.organize_by_events(all_updated, directory, simular=False)

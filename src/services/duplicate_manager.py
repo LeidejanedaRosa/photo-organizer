@@ -7,11 +7,11 @@ from ..domain.image import ImageInfo
 
 class DuplicateManager:
     
-    def find_duplicates(self, imagens: List[ImageInfo]) -> Dict[str, List[ImageInfo]]:
+    def find_duplicates(self, images: List[ImageInfo]) -> Dict[str, List[ImageInfo]]:
         
         grupos_hash: Dict[str, List[ImageInfo]] = defaultdict(list)
         
-        for img in imagens:
+        for img in images:
             if img.hash_imagem:
                 grupos_hash[img.hash_imagem].append(img)
         
@@ -49,16 +49,16 @@ class DuplicateManager:
         for i, grupo in enumerate(duplicadas.values(), 1):
             original = grupo[0]
             print(f"\n📂 Grupo {i}/{total_grupos} de duplicatas:")
-            print(f"   🏠 Mantendo: {original.arquivo}")
+            print(f"   🏠 Mantendo: {original.file}")
             
-            for duplicata in grupo[1:]:
-                origem = os.path.join(diretorio_origem, duplicata.arquivo)
-                destino = os.path.join(pasta_duplicadas, duplicata.arquivo)
+            for duplicate in grupo[1:]:
+                origem = os.path.join(diretorio_origem, duplicate.file)
+                destino = os.path.join(pasta_duplicadas, duplicate.file)
                 
                 if simular:
-                    print(f"   📤 Moveria: {duplicata.arquivo}")
+                    print(f"   📤 Moveria: {duplicate.file}")
                 else:
-                    print(f"   📤 Movendo: {duplicata.arquivo}")
+                    print(f"   📤 Movendo: {duplicate.file}")
                     try:
                         shutil.move(origem, destino)
                         total_movidas += 1
@@ -68,10 +68,10 @@ class DuplicateManager:
         
         print("─" * 60)
         if not simular:
-            print(f"📊 RESULTADO: {total_movidas} imagens movidas para 'duplicadas/'")
+            print(f"📊 RESULTADO: {total_movidas} images moved para 'duplicadas/'")
         else:
             duplicatas_total = sum(len(grupo) - 1 for grupo in duplicadas.values())
-            print(f"📊 PREVISÃO: {duplicatas_total} imagens seriam movidas")
+            print(f"📊 PREVISÃO: {duplicatas_total} images seriam moved")
         print("─" * 60)
         
         return total_movidas

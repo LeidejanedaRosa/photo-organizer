@@ -26,20 +26,20 @@ class PhotoOrganizerService:
         self.configuration = configuration
         self.filename_generator = FilenameGenerator(configuration)
     
-    def analyze_directory(self, diretorio: str) -> tuple[List[ImageInfo], List[ImageInfo]]:
+    def analyze_directory(self, directory: str) -> tuple[List[ImageInfo], List[ImageInfo]]:
         
-        todas_imagens = self.image_analyzer.analyze_directory(diretorio)
+        all_images = self.image_analyzer.analyze_directory(directory)
         
         imagens_organizadas = []
         imagens_nao_organizadas = []
         
-        for img in todas_imagens:
-            if self.filename_generator.is_organized(img.arquivo):
+        for img in all_images:
+            if self.filename_generator.is_organized(img.file):
                 imagens_organizadas.append(img)
             else:
                 imagens_nao_organizadas.append(img)
         
-        key_func = lambda x: x.data_preferencial
+        key_func = lambda x: x.preferred_date
         imagens_organizadas.sort(key=key_func)
         imagens_nao_organizadas.sort(key=key_func)
         
@@ -47,93 +47,93 @@ class PhotoOrganizerService:
     
     def detect_and_move_duplicates(
         self, 
-        imagens: List[ImageInfo], 
-        diretorio: str, 
+        images: List[ImageInfo], 
+        directory: str, 
         simular: bool = True
     ) -> int:
         
-        duplicadas = self.duplicate_manager.find_duplicates(imagens)
+        duplicadas = self.duplicate_manager.find_duplicates(images)
         if duplicadas and not simular:
-            backup_file = self.backup_manager.create_backup(diretorio, "mover_duplicatas")
+            backup_file = self.backup_manager.create_backup(directory, "mover_duplicatas")
             print(f"💾 Backup criado: {backup_file}")
         
-        return self.duplicate_manager.move_duplicates(duplicadas, diretorio, simular)
+        return self.duplicate_manager.move_duplicates(duplicadas, directory, simular)
     
     def rename_images(
         self, 
-        imagens: List[ImageInfo], 
-        diretorio: str, 
-        eventos: Optional[Dict[str, str]] = None,
+        images: List[ImageInfo], 
+        directory: str, 
+        events: Optional[Dict[str, str]] = None,
         simular: bool = True
     ) -> int:
         
-        if not simular and imagens:
-            backup_file = self.backup_manager.create_backup(diretorio, "renomear_imagens")
+        if not simular and images:
+            backup_file = self.backup_manager.create_backup(directory, "renomear_imagens")
             print(f"💾 Backup criado: {backup_file}")
         
-        return self.file_renamer.rename_images(imagens, diretorio, eventos, simular)
+        return self.file_renamer.rename_images(images, directory, events, simular)
     
     def organize_by_years(
         self, 
-        imagens: List[ImageInfo], 
-        diretorio: str, 
+        images: List[ImageInfo], 
+        directory: str, 
         simular: bool = True
     ) -> Dict[int, List[ImageInfo]]:
         
-        if not simular and imagens:
-            backup_file = self.backup_manager.create_backup(diretorio, "organizar_anos")
+        if not simular and images:
+            backup_file = self.backup_manager.create_backup(directory, "organizar_anos")
             print(f"💾 Backup criado: {backup_file}")
         
-        return self.folder_organizer.organize_by_years(imagens, diretorio, simular)
+        return self.folder_organizer.organize_by_years(images, directory, simular)
     
     def organize_by_events(
         self, 
-        imagens: List[ImageInfo], 
-        diretorio: str, 
+        images: List[ImageInfo], 
+        directory: str, 
         simular: bool = True
     ) -> int:
         
-        eventos_detectados = self.folder_organizer.detect_events_in_files(imagens)
+        eventos_detectados = self.folder_organizer.detect_events_in_files(images)
         
         if not simular and eventos_detectados:
-            backup_file = self.backup_manager.create_backup(diretorio, "organizar_eventos")
+            backup_file = self.backup_manager.create_backup(directory, "organizar_eventos")
             print(f"💾 Backup criado: {backup_file}")
         
-        return self.folder_organizer.organize_by_events(diretorio, eventos_detectados, simular)
+        return self.folder_organizer.organize_by_events(directory, eventos_detectados, simular)
 
     def organize_by_custom_periods(
         self,
-        imagens: List[ImageInfo],
-        diretorio: str,
-        configuracao: 'ProjectConfiguration',
+        images: List[ImageInfo],
+        directory: str,
+        configuration: 'ProjectConfiguration',
         simular: bool = True
     ) -> Dict[str, List[ImageInfo]]:
         
-        if not simular and imagens:
+        if not simular and images:
             backup_file = self.backup_manager.create_backup(
-                diretorio, "organizar_periodos")
+                directory, "organizar_periodos")
             print(f"💾 Backup criado: {backup_file}")
 
         return self.folder_organizer.organize_by_custom_periods(
-            imagens, diretorio, configuracao, simular)
+            images, directory, configuration, simular)
 
-    def generate_report(self, imagens: List[ImageInfo]) -> None:
+    def generate_report(self, images: List[ImageInfo]) -> None:
         
-        self.report_generator.generate_detailed_report(imagens)
+        self.report_generator.generate_detailed_report(images)
     
     def search_photos_by_period(
         self,
-        imagens: List[ImageInfo],
-        data_inicio: str,
-        data_fim: str
+        images: List[ImageInfo],
+        start_date: str,
+        end_date: str
     ) -> List[ImageInfo]:
         
         return self.report_generator.search_photos_by_period(
-            imagens, data_inicio, data_fim)
+            images, start_date, end_date)
     
-    def create_manual_backup(self, diretorio: str) -> str:
+    def create_manual_backup(self, directory: str) -> str:
         
-        return self.backup_manager.create_backup(diretorio, "backup_manual")
+        return self.backup_manager.create_backup(directory, "backup_manual")
     
     def print_analysis_statistics(
         self,
@@ -144,30 +144,30 @@ class PhotoOrganizerService:
         total_imagens = len(imagens_nao_organizadas) + len(imagens_organizadas)
         
         print("\n📊 ESTATÍSTICAS:")
-        print(f"Total de imagens encontradas: {total_imagens}")
+        print(f"Total de images encontradas: {total_imagens}")
         print(f"Já organizadas: {len(imagens_organizadas)}")
         print(f"Precisam ser organizadas: {len(imagens_nao_organizadas)}")
         
         if imagens_organizadas:
             print(f"\n✅ IMAGENS JÁ ORGANIZADAS ({len(imagens_organizadas)}):")
             for img in imagens_organizadas:
-                print(f"  - {img.arquivo}")
+                print(f"  - {img.file}")
         
         if not imagens_nao_organizadas:
-            print("\n🎉 Todas as imagens já estão organizadas!")
+            print("\n🎉 Todas as images já estão organizadas!")
             return
         
         print(f"\n📋 IMAGENS PARA ORGANIZAR ({len(imagens_nao_organizadas)}):")
         self._print_image_details(imagens_nao_organizadas)
     
-    def _print_image_details(self, imagens: List[ImageInfo]) -> None:
+    def _print_image_details(self, images: List[ImageInfo]) -> None:
         
-        for img in imagens:
-            data = img.data_preferencial
+        for img in images:
+            date = img.preferred_date
             
-            print(f"Arquivo: {img.arquivo}")
+            print(f"Arquivo: {img.file}")
             print(f"Formato: {img.formato}")
-            print(f"Dimensões: {img.dimensoes}")
+            print(f"Dimensões: {img.dimensions}")
             print(f"Modo: {img.modo}")
             print(f"Tamanho (bytes): {img.tamanho}")
             print(f"Data de modificação: "

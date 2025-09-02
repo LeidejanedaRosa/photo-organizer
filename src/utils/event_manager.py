@@ -4,37 +4,37 @@ from typing import Dict
 class EventManager:
     
     @staticmethod
-    def solicitar_eventos() -> Dict[str, str]:
+    def request_events() -> Dict[str, str]:
         
-        eventos = {}
+        events = {}
         print("\n" + "─" * 50)
         print("🎉 CONFIGURAÇÃO DE EVENTOS")
         print("─" * 50)
-        print("📝 Defina eventos especiais para as datas das fotos.")
-        print("💡 Formato da data: DD/MM/AAAA")
-        print("🔚 Para finalizar: deixe a data em branco e pressione Enter")
+        print("📝 Defina events especiais para as datas das fotos.")
+        print("💡 Formato da date: DD/MM/AAAA")
+        print("🔚 Para finalizar: deixe a date em branco e pressione Enter")
         print("─" * 50)
         
-        contador = 1
+        counter = 1
         while True:
-            data = input(f"\n📅 Data do evento #{contador} (DD/MM/AAAA): ").strip()
-            if not data:
+            date = input(f"\n📅 Data do evento #{counter} (DD/MM/AAAA): ").strip()
+            if not date:
                 break
                 
             try:
-                data_obj = datetime.strptime(data, '%d/%m/%Y')
-                data_fmt = data_obj.strftime('%d%m%Y')
-                descricao = input("🏷️  Descrição do evento: ").strip()
-                if descricao:
-                    eventos[data_fmt] = descricao
-                    print(f"✅ Evento registrado: {data} - {descricao}")
-                    contador += 1
+                date_obj = datetime.strptime(date, '%d/%m/%Y')
+                date_fmt = date_obj.strftime('%d%m%Y')
+                description = input("🏷️  Descrição do evento: ").strip()
+                if description:
+                    events[date_fmt] = description
+                    print(f"✅ Evento registrado: {date} - {description}")
+                    counter += 1
             except ValueError:
                 print("❌ Data inválida! Use o formato DD/MM/AAAA")
         
-        if eventos:
-            print(f"\n🎊 {len(eventos)} evento(s) configurado(s) com sucesso!")
+        if events:
+            print(f"\n🎊 {len(events)} evento(s) configurado(s) com sucesso!")
         else:
             print("\n📝 Nenhum evento configurado.")
         
-        return eventos
+        return events

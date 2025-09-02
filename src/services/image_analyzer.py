@@ -18,9 +18,9 @@ class ImageAnalyzer:
                 hash_imagem = self._calculate_image_hash(caminho)
                 
                 return ImageInfo(
-                    arquivo=os.path.basename(caminho),
+                    file=os.path.basename(caminho),
                     formato=fmt,
-                    dimensoes=img.size,
+                    dimensions=img.size,
                     modo=img.mode,
                     tamanho=os.path.getsize(caminho),
                     data_mod=data_mod,
@@ -38,9 +38,9 @@ class ImageAnalyzer:
             if exif is not None:
                 for tag_id in exif:
                     tag = TAGS.get(tag_id, tag_id)
-                    data = exif.get(tag_id)
+                    date = exif.get(tag_id)
                     if tag == 'DateTimeOriginal':
-                        return datetime.strptime(data, '%Y:%m:%d %H:%M:%S')
+                        return datetime.strptime(date, '%Y:%m:%d %H:%M:%S')
         except (AttributeError, ValueError, TypeError):
             return None
         return None
@@ -59,15 +59,15 @@ class ImageAnalyzer:
             return ""
         return hasher.hexdigest()
     
-    def analyze_directory(self, diretorio: str) -> List[ImageInfo]:
+    def analyze_directory(self, directory: str) -> List[ImageInfo]:
         
-        imagens = []
+        images = []
         
-        for arquivo in os.listdir(diretorio):
-            caminho = os.path.join(diretorio, arquivo)
+        for file in os.listdir(directory):
+            caminho = os.path.join(directory, file)
             if os.path.isfile(caminho):
                 info = self.analyze_image(caminho)
                 if info:
-                    imagens.append(info)
+                    images.append(info)
         
-        return imagens
+        return images

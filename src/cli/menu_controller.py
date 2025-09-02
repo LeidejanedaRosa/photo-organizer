@@ -4,14 +4,14 @@ from typing import Optional
 class MenuController:
     
     @staticmethod
-    def exibir_menu_inteligente(tem_fotos_organizadas: bool, tem_configuracao: bool) -> int:
+    def display_smart_menu(has_organized_photos: bool, has_configuration: bool) -> int:
         
         print("=" * 70)
         print("🖼️  ORGANIZADOR DE FOTOS  🖼️")
         print("=" * 70)
         print()
         
-        if not tem_fotos_organizadas:
+        if not has_organized_photos:
             
             print("� PRIMEIROS PASSOS:")
             print("   1️⃣  Configurar como nomear suas fotos")
@@ -32,7 +32,7 @@ class MenuController:
             print("   4️⃣  Fazer tudo (duplicatas + renomeação)")
             print()
             print("📁 ORGANIZAR EM PASTAS:")
-            print("   5️⃣  Criar pastas por eventos nas fotos")
+            print("   5️⃣  Criar pastas por events nas fotos")
             print("   6️⃣  Criar pastas por períodos personalizados")
             print()
             print("🔍 BUSCA E RELATÓRIOS:")
@@ -48,9 +48,9 @@ class MenuController:
         
         while True:
             try:
-                opcao = input(f"\n🔢 Escolha uma opção (1-{max_opcao}): ").strip()
-                if opcao in opcoes_validas:
-                    return int(opcao)
+                option = input(f"\n🔢 Escolha uma opção (1-{max_opcao}): ").strip()
+                if option in opcoes_validas:
+                    return int(option)
                 else:
                     print(f"❌ Opção inválida! Digite um número de 1 a {max_opcao}.")
             except KeyboardInterrupt:
@@ -58,7 +58,7 @@ class MenuController:
                 exit(0)
     
     @staticmethod
-    def solicitar_diretorio() -> str:
+    def request_directory() -> str:
         
         print("\n📁 CONFIGURAÇÃO DO DIRETÓRIO:")
         
@@ -72,21 +72,21 @@ class MenuController:
                 print("❌ Diretório não encontrado! Tente novamente.")
     
     @staticmethod
-    def confirmar_operacao(mensagem: str) -> bool:
+    def confirm_operation(message: str) -> bool:
         
-        resposta = input(f"\n❓ {mensagem} (s/N): ").strip().lower()
+        resposta = input(f"\n❓ {message} (s/N): ").strip().lower()
         return resposta == 's'
     
     @staticmethod
-    def solicitar_periodo() -> tuple[str, str]:
+    def request_period() -> tuple[str, str]:
         
         print("📅 Digite o período desejado:")
-        data_inicio = input("   📆 Data início (DD/MM/AAAA): ").strip()
-        data_fim = input("   📆 Data fim (DD/MM/AAAA): ").strip()
-        return data_inicio, data_fim
+        start_date = input("   📆 Data início (DD/MM/AAAA): ").strip()
+        end_date = input("   📆 Data fim (DD/MM/AAAA): ").strip()
+        return start_date, end_date
     
     @staticmethod
-    def imprimir_separador(titulo: Optional[str] = None) -> None:
+    def print_separator(titulo: Optional[str] = None) -> None:
         
         print("\n" + "=" * 70)
         if titulo:
@@ -94,7 +94,7 @@ class MenuController:
             print("=" * 70)
     
     @staticmethod
-    def imprimir_conclusao() -> None:
+    def print_conclusion() -> None:
         
         print("\n" + "=" * 70)
         print("✅ OPERAÇÃO CONCLUÍDA!")

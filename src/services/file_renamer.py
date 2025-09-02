@@ -15,9 +15,9 @@ class FilenameGenerator:
         if configuration is None:
             from datetime import datetime
             configuration = ConfigurationManager.create_custom_configuration(
-                data_inicio=datetime.now().replace(month=1, day=1),
-                prefixo="IMG",
-                incluir_periodo=True
+                start_date=datetime.now().replace(month=1, day=1),
+                prefix="IMG",
+                include_period=True
             )
         self.configuration = configuration
     
@@ -25,32 +25,32 @@ class FilenameGenerator:
         self,
         info: ImageInfo,
         numero_sequencial: int = 0,
-        eventos: Optional[Dict[str, str]] = None
+        events: Optional[Dict[str, str]] = None
     ) -> str:
         
-        data = info.data_preferencial
+        date = info.preferred_date
         
-        if not self.configuration.is_date_in_range(data):
+        if not self.configuration.is_date_in_range(date):
             
-            nome_base = data.strftime(self.configuration.formato_data)
-            if self.configuration.incluir_sequencial:
+            nome_base = date.strftime(self.configuration.date_format)
+            if self.configuration.include_sequential:
                 nome_base += f"({numero_sequencial:02d})"
         else:
             
             evento_str = None
-            if eventos:
-                data_fmt = data.strftime('%d%m%Y')
-                evento_str = eventos.get(data_fmt)
+            if events:
+                date_fmt = date.strftime('%d%m%Y')
+                evento_str = events.get(date_fmt)
             
             nome_base = self.configuration.generate_filename_pattern(
-                data, numero_sequencial, evento_str
+                date, numero_sequencial, evento_str
             )
         
-        return nome_base + info.extensao
+        return nome_base + info.extension
     
-    def is_organized(self, nome_arquivo: str) -> bool:
+    def is_organized(self, filename: str) -> bool:
         
-        nome_sem_ext = Path(nome_arquivo).stem
+        nome_sem_ext = Path(filename).stem
         
         padrao_antigo = r'^\d{2} - IMG \d{8}\(\d{2}\)(?:\s-\s.+)?$'
         
@@ -68,9 +68,9 @@ class FileRenamer:
     
     def rename_images(
         self,
-        imagens: List[ImageInfo],
-        diretorio: str,
-        eventos: Optional[Dict[str, str]] = None,
+        images: List[ImageInfo],
+        directory: str,
+        events: Optional[Dict[str, str]] = None,
         simular: bool = True
     ) -> int:
         
@@ -81,25 +81,25 @@ class FileRenamer:
         
         print("─" * 60)
         
-        grupos = self._group_by_date(imagens)
+        grupos = self._group_by_date(images)
         total_renomeados = 0
         total_erros = 0
         
         for _, imgs_do_dia in grupos.items():
-            imgs_do_dia.sort(key=lambda x: x.data_preferencial)
+            imgs_do_dia.sort(key=lambda x: x.preferred_date)
             
             for idx, img in enumerate(imgs_do_dia):
-                caminho_atual = os.path.join(diretorio, img.arquivo)
+                caminho_atual = os.path.join(directory, img.file)
                 novo_nome = self.filename_generator.generate_filename(
-                    img, numero_sequencial=idx, eventos=eventos
+                    img, numero_sequencial=idx, events=events
                 )
-                novo_caminho = os.path.join(diretorio, novo_nome)
+                novo_caminho = os.path.join(directory, novo_nome)
                 
                 if simular:
-                    print(f"📄 {img.arquivo}")
+                    print(f"📄 {img.file}")
                     print(f"   ➡️  {novo_nome}")
                 else:
-                    print(f"📄 Renomeando: {img.arquivo}")
+                    print(f"📄 Renomeando: {img.file}")
                     try:
                         shutil.move(caminho_atual, novo_caminho)
                         total_renomeados += 1
@@ -117,12 +117,12 @@ class FileRenamer:
         
         return total_renomeados
     
-    def _group_by_date(self, imagens: List[ImageInfo]) -> Dict[str, List[ImageInfo]]:
+    def _group_by_date(self, images: List[ImageInfo]) -> Dict[str, List[ImageInfo]]:
         
         grupos: Dict[str, List[ImageInfo]] = {}
-        for img in imagens:
-            data = img.data_preferencial.strftime('%d%m%Y')
-            if data not in grupos:
-                grupos[data] = []
-            grupos[data].append(img)
+        for img in images:
+            date = img.preferred_date.strftime('%d%m%Y')
+            if date not in grupos:
+                grupos[date] = []
+            grupos[date].append(img)
         return grupos

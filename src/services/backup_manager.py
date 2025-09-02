@@ -7,10 +7,10 @@ from ..domain.image import ImageInfo
 
 class BackupManager:
     
-    def create_backup(self, diretorio: str, operacao: str) -> str:
+    def create_backup(self, directory: str, operacao: str) -> str:
         
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        backup_dir = os.path.join(diretorio, "backups")
+        backup_dir = os.path.join(directory, "backups")
         
         if not os.path.exists(backup_dir):
             os.makedirs(backup_dir)
@@ -20,13 +20,13 @@ class BackupManager:
         )
         
         arquivos_atuais = []
-        for arquivo in os.listdir(diretorio):
-            caminho = os.path.join(diretorio, arquivo)
-            if os.path.isfile(caminho) and not arquivo.endswith('.json'):
+        for file in os.listdir(directory):
+            caminho = os.path.join(directory, file)
+            if os.path.isfile(caminho) and not file.endswith('.json'):
                 try:
                     stat = os.stat(caminho)
                     arquivos_atuais.append({
-                        "nome": arquivo,
+                        "nome": file,
                         "tamanho": stat.st_size,
                         "modificado": datetime.fromtimestamp(
                             stat.st_mtime
@@ -38,7 +38,7 @@ class BackupManager:
         backup_data = {
             "operacao": operacao,
             "timestamp": timestamp,
-            "diretorio": diretorio,
+            "directory": directory,
             "arquivos": arquivos_atuais
         }
         
