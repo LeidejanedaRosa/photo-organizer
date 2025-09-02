@@ -7,6 +7,7 @@ from collections import defaultdict
 
 from ..domain.image import ImageInfo, Event
 from ..domain.configuration import ProjectConfiguration, ConfigurationManager
+from ..utils.ui_formatter import UIFormatter
 
 class FilenameGenerator:
     
@@ -65,6 +66,7 @@ class FileRenamer:
     
     def __init__(self):
         self.filename_generator = FilenameGenerator()
+        self.ui_formatter = UIFormatter()
     
     def rename_images(
         self,

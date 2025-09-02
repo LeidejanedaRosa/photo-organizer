@@ -8,6 +8,7 @@ from .file_renamer import FileRenamer, FilenameGenerator
 from .folder_organizer import FolderOrganizer
 from .backup_manager import BackupManager
 from .report_generator import ReportGenerator
+from ..utils.operation_manager import OperationManager
 
 class PhotoOrganizerService:
     
@@ -20,6 +21,7 @@ class PhotoOrganizerService:
         self.backup_manager = BackupManager()
         self.report_generator = ReportGenerator()
         self.filename_generator = FilenameGenerator(configuration)
+        self.operation_manager = OperationManager(self.backup_manager)
     
     def set_configuration(self, configuration: ProjectConfiguration) -> None:
         
@@ -46,60 +48,97 @@ class PhotoOrganizerService:
         return imagens_nao_organizadas, imagens_organizadas
     
     def detect_and_move_duplicates(
-        self, 
-        images: List[ImageInfo], 
-        directory: str, 
+        self,
+        images: List[ImageInfo],
+        directory: str,
+        simular: bool = True
+    ) -> int:
+        
+        return self.operation_manager.execute_with_backup(
+            self._execute_duplicate_detection,
+            directory,
+            "mover_duplicatas",
+            bool(images),
+            images,
+            directory,
+            simular=simular
+        )
+    
+    def _execute_duplicate_detection(
+        self,
+        images: List[ImageInfo],
+        directory: str,
         simular: bool = True
     ) -> int:
         
         duplicadas = self.duplicate_manager.find_duplicates(images)
-        if duplicadas and not simular:
-            backup_file = self.backup_manager.create_backup(directory, "mover_duplicatas")
-            print(f"💾 Backup criado: {backup_file}")
-        
         return self.duplicate_manager.move_duplicates(duplicadas, directory, simular)
     
     def rename_images(
-        self, 
-        images: List[ImageInfo], 
-        directory: str, 
+        self,
+        images: List[ImageInfo],
+        directory: str,
         events: Optional[Dict[str, str]] = None,
         simular: bool = True
     ) -> int:
         
-        if not simular and images:
-            backup_file = self.backup_manager.create_backup(directory, "renomear_imagens")
-            print(f"💾 Backup criado: {backup_file}")
-        
-        return self.file_renamer.rename_images(images, directory, events, simular)
+        return self.operation_manager.execute_with_backup(
+            self.file_renamer.rename_images,
+            directory,
+            "renomear_imagens",
+            bool(images),
+            images,
+            directory,
+            events,
+            simular=simular
+        )
     
     def organize_by_years(
-        self, 
-        images: List[ImageInfo], 
-        directory: str, 
+        self,
+        images: List[ImageInfo],
+        directory: str,
         simular: bool = True
     ) -> Dict[int, List[ImageInfo]]:
         
-        if not simular and images:
-            backup_file = self.backup_manager.create_backup(directory, "organizar_anos")
-            print(f"💾 Backup criado: {backup_file}")
-        
-        return self.folder_organizer.organize_by_years(images, directory, simular)
+        return self.operation_manager.execute_with_backup(
+            self.folder_organizer.organize_by_years,
+            directory,
+            "organizar_anos",
+            bool(images),
+            images,
+            directory,
+            simular=simular
+        )
     
     def organize_by_events(
-        self, 
-        images: List[ImageInfo], 
-        directory: str, 
+        self,
+        images: List[ImageInfo],
+        directory: str,
         simular: bool = True
     ) -> int:
         
         eventos_detectados = self.folder_organizer.detect_events_in_files(images)
         
-        if not simular and eventos_detectados:
-            backup_file = self.backup_manager.create_backup(directory, "organizar_eventos")
-            print(f"💾 Backup criado: {backup_file}")
+        return self.operation_manager.execute_with_backup(
+            self._execute_organize_by_events,
+            directory,
+            "organizar_eventos",
+            bool(eventos_detectados),
+            directory,
+            eventos_detectados,
+            simular=simular
+        )
+    
+    def _execute_organize_by_events(
+        self,
+        directory: str,
+        eventos_detectados: Dict,
+        simular: bool = True
+    ) -> int:
         
-        return self.folder_organizer.organize_by_events(directory, eventos_detectados, simular)
+        return self.folder_organizer.organize_by_events(
+            directory, eventos_detectados, simular
+        )
 
     def organize_by_custom_periods(
         self,

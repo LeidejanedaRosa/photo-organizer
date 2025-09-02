@@ -4,8 +4,15 @@ from typing import Dict, List
 from collections import defaultdict
 
 from ..domain.image import ImageInfo
+from ..utils.ui_formatter import UIFormatter
+from ..utils.file_manager import FileManager
+
 
 class DuplicateManager:
+    
+    def __init__(self):
+        self.ui_formatter = UIFormatter()
+        self.file_manager = FileManager()
     
     def find_duplicates(self, images: List[ImageInfo]) -> Dict[str, List[ImageInfo]]:
         
@@ -28,26 +35,22 @@ class DuplicateManager:
         simular: bool = True
     ) -> int:
         
-        if not duplicadas:
-            print("✅ Nenhuma imagem duplicada encontrada!")
+        if not self.ui_formatter.validate_list_not_empty(
+            duplicadas, "Nenhuma imagem duplicada encontrada!"
+        ):
             return 0
         
         pasta_duplicadas = os.path.join(diretorio_origem, "duplicadas")
-        if not simular and not os.path.exists(pasta_duplicadas):
-            os.makedirs(pasta_duplicadas)
         
-        if simular:
-            print("\n🔄 SIMULAÇÃO: Movendo duplicatas...")
-        else:
-            print("\n📦 MOVENDO DUPLICATAS...")
+        self.ui_formatter.print_operation_header("Movendo duplicatas", simular)
+        self.ui_formatter.print_separator()
         
-        print("─" * 60)
-        
-        total_movidas = 0
+        total_moved = 0
         total_grupos = len(duplicadas)
         
         for i, grupo in enumerate(duplicadas.values(), 1):
             original = grupo[0]
+            
             print(f"\n📂 Grupo {i}/{total_grupos} de duplicatas:")
             print(f"   🏠 Mantendo: {original.file}")
             
@@ -55,23 +58,24 @@ class DuplicateManager:
                 origem = os.path.join(diretorio_origem, duplicate.file)
                 destino = os.path.join(pasta_duplicadas, duplicate.file)
                 
-                if simular:
-                    print(f"   📤 Moveria: {duplicate.file}")
+                if not simular:
+                    self.file_manager.create_directory_if_not_exists(
+                        pasta_duplicadas, "duplicadas"
+                    )
+                
+                if self.file_manager.move_single_file(
+                    origem, destino, duplicate.file, simular
+                ):
+                    if not simular:
+                        total_moved += 1
                 else:
-                    print(f"   📤 Movendo: {duplicate.file}")
-                    try:
-                        shutil.move(origem, destino)
-                        total_movidas += 1
-                        print("      ✅ Sucesso")
-                    except (IOError, OSError) as e:
-                        print(f"      ❌ Erro: {e}")
+                    total_moved += 1 if simular else 0
         
-        print("─" * 60)
-        if not simular:
-            print(f"📊 RESULTADO: {total_movidas} images moved para 'duplicadas/'")
-        else:
-            duplicatas_total = sum(len(grupo) - 1 for grupo in duplicadas.values())
-            print(f"📊 PREVISÃO: {duplicatas_total} images seriam moved")
-        print("─" * 60)
+        self.ui_formatter.print_operation_result(
+            "Movimentação de duplicatas",
+            total_moved,
+            "imagens",
+            simular
+        )
         
-        return total_movidas
+        return total_moved
