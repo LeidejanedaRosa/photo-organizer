@@ -24,7 +24,7 @@ class FileManager:
         images: List[ImageInfo],
         source_directory: str,
         target_directory: str,
-        simular: bool = True,
+        simulate: bool = True,
     ) -> int:
 
         moved_count = 0
@@ -33,7 +33,7 @@ class FileManager:
             source_path = os.path.join(source_directory, img.file)
             target_path = os.path.join(target_directory, img.file)
 
-            if simular:
+            if simulate:
                 print(f"   📤 Moveria: {img.file}")
             else:
                 print(f"   📤 Movendo: {img.file}")
@@ -44,14 +44,14 @@ class FileManager:
                 except (IOError, OSError) as e:
                     print(f"      ❌ Erro: {e}")
 
-        return moved_count if not simular else len(images)
+        return moved_count if not simulate else len(images)
 
     @staticmethod
     def move_single_file(
-        source_path: str, target_path: str, filename: str, simular: bool = True
+        source_path: str, target_path: str, filename: str, simulate: bool = True
     ) -> bool:
 
-        if simular:
+        if simulate:
             print(f"   📤 Moveria: {filename}")
             return True
         else:

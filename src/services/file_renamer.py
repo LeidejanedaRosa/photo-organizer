@@ -1,12 +1,11 @@
 import os
 import re
 import shutil
-from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List, Optional
 
 from ..domain.configuration import ConfigurationManager, ProjectConfiguration
-from ..domain.image import Event, ImageInfo
+from ..domain.image import ImageInfo
 from ..utils.ui_formatter import UIFormatter
 
 
@@ -27,7 +26,7 @@ class FilenameGenerator:
     def generate_filename(
         self,
         info: ImageInfo,
-        numero_sequencial: int = 0,
+        sequential_number: int = 0,
         events: Optional[Dict[str, str]] = None,
     ) -> str:
 
@@ -35,32 +34,32 @@ class FilenameGenerator:
 
         if not self.configuration.is_date_in_range(date):
 
-            nome_base = date.strftime(self.configuration.date_format)
+            base_name = date.strftime(self.configuration.date_format)
             if self.configuration.include_sequential:
-                nome_base += f"({numero_sequencial:02d})"
+                base_name += f"({sequential_number:02d})"
         else:
 
-            evento_str = None
+            event_str = None
             if events:
                 date_fmt = date.strftime("%d%m%Y")
-                evento_str = events.get(date_fmt)
+                event_str = events.get(date_fmt)
 
-            nome_base = self.configuration.generate_filename_pattern(
-                date, numero_sequencial, evento_str
+            base_name = self.configuration.generate_filename_pattern(
+                date, sequential_number, event_str
             )
 
-        return nome_base + info.extension
+        return base_name + info.extension
 
     def is_organized(self, filename: str) -> bool:
 
-        nome_sem_ext = Path(filename).stem
+        filename_without_ext = Path(filename).stem
 
-        padrao_antigo = r"^\d{2} - IMG \d{8}\(\d{2}\)(?:\s-\s.+)?$"
+        old_pattern = r"^\d{2} - IMG \d{8}\(\d{2}\)(?:\s-\s.+)?$"
 
-        padrao_novo = r".*\d{8}\(\d{2}\)(?:\s-\s.+)?$"
+        new_pattern = r".*\d{8}\(\d{2}\)(?:\s-\s.+)?$"
 
-        return bool(re.match(padrao_antigo, nome_sem_ext)) or bool(
-            re.match(padrao_novo, nome_sem_ext)
+        return bool(re.match(old_pattern, filename_without_ext)) or bool(
+            re.match(new_pattern, filename_without_ext)
         )
 
 
@@ -75,60 +74,60 @@ class FileRenamer:
         images: List[ImageInfo],
         directory: str,
         events: Optional[Dict[str, str]] = None,
-        simular: bool = True,
+        simulate: bool = True,
     ) -> int:
 
-        if simular:
+        if simulate:
             print("\n🔄 SIMULAÇÃO: Renomeando arquivos...")
         else:
             print("\n✨ RENOMEANDO ARQUIVOS...")
 
         print("─" * 60)
 
-        grupos = self._group_by_date(images)
-        total_renomeados = 0
-        total_erros = 0
+        groups = self._group_by_date(images)
+        total_renamed = 0
+        total_errors = 0
 
-        for _, imgs_do_dia in grupos.items():
-            imgs_do_dia.sort(key=lambda x: x.preferred_date)
+        for _, daily_images in groups.items():
+            daily_images.sort(key=lambda x: x.preferred_date)
 
-            for idx, img in enumerate(imgs_do_dia):
-                caminho_atual = os.path.join(directory, img.file)
-                novo_nome = self.filename_generator.generate_filename(
-                    img, numero_sequencial=idx, events=events
+            for idx, img in enumerate(daily_images):
+                current_path = os.path.join(directory, img.file)
+                new_name = self.filename_generator.generate_filename(
+                    img, sequential_number=idx, events=events
                 )
-                novo_caminho = os.path.join(directory, novo_nome)
+                new_path = os.path.join(directory, new_name)
 
-                if simular:
+                if simulate:
                     print(f"📄 {img.file}")
-                    print(f"   ➡️  {novo_nome}")
+                    print(f"   ➡️  {new_name}")
                 else:
                     print(f"📄 Renomeando: {img.file}")
                     try:
-                        shutil.move(caminho_atual, novo_caminho)
-                        total_renomeados += 1
-                        print(f"   ✅ Sucesso: {novo_nome}")
+                        shutil.move(current_path, new_path)
+                        total_renamed += 1
+                        print(f"   ✅ Sucesso: {new_name}")
                     except (IOError, OSError) as e:
-                        total_erros += 1
+                        total_errors += 1
                         print(f"   ❌ Erro: {e}")
 
-        if not simular:
+        if not simulate:
             print("─" * 60)
             print("📊 RESULTADO:")
-            print(f"   ✅ Renomeados com sucesso: {total_renomeados}")
-            print(f"   ❌ Erros: {total_erros}")
+            print(f"   ✅ Renomeados com sucesso: {total_renamed}")
+            print(f"   ❌ Erros: {total_errors}")
             print("─" * 60)
 
-        return total_renomeados
+        return total_renamed
 
     def _group_by_date(
         self, images: List[ImageInfo]
     ) -> Dict[str, List[ImageInfo]]:
 
-        grupos: Dict[str, List[ImageInfo]] = {}
+        groups: Dict[str, List[ImageInfo]] = {}
         for img in images:
             date = img.preferred_date.strftime("%d%m%Y")
-            if date not in grupos:
-                grupos[date] = []
-            grupos[date].append(img)
-        return grupos
+            if date not in groups:
+                groups[date] = []
+            groups[date].append(img)
+        return groups

@@ -30,7 +30,7 @@ class BaseOrganizer(ABC):
         pass
 
     def organize(
-        self, images: List[ImageInfo], directory: str, simular: bool = True
+        self, images: List[ImageInfo], directory: str, simulate: bool = True
     ) -> Any:
 
         if not self.ui_formatter.validate_list_not_empty(
@@ -45,7 +45,7 @@ class BaseOrganizer(ABC):
             return {}
 
         self.ui_formatter.print_operation_header(
-            self._get_operation_name(), simular
+            self._get_operation_name(), simulate
         )
         self.ui_formatter.print_separator()
 
@@ -55,11 +55,11 @@ class BaseOrganizer(ABC):
         for group_name, group_images in grouped_images.items():
             result[group_name] = group_images
             total_processed += self._process_group(
-                group_name, group_images, directory, simular
+                group_name, group_images, directory, simulate
             )
 
         self.ui_formatter.print_operation_result(
-            self._get_operation_name(), total_processed, "imagens", simular
+            self._get_operation_name(), total_processed, "imagens", simulate
         )
 
         return result
@@ -69,7 +69,7 @@ class BaseOrganizer(ABC):
         group_name: str,
         images: List[ImageInfo],
         directory: str,
-        simular: bool,
+        simulate: bool,
     ) -> int:
 
         self.ui_formatter.print_group_header(
@@ -78,7 +78,7 @@ class BaseOrganizer(ABC):
 
         target_directory = self._get_target_directory(directory, group_name)
 
-        if not simular:
+        if not simulate:
             self.file_manager.create_directory_if_not_exists(
                 target_directory, group_name
             )
@@ -86,7 +86,7 @@ class BaseOrganizer(ABC):
             print(f"   📁 Criaria pasta: {group_name}/")
 
         return self.file_manager.move_files_to_directory(
-            images, directory, target_directory, simular
+            images, directory, target_directory, simulate
         )
 
     def _get_target_directory(

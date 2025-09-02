@@ -18,9 +18,9 @@ class OperationManager:
         **kwargs,
     ) -> Any:
 
-        simular = kwargs.get("simular", True)
+        simulate = kwargs.get("simulate", True)
 
-        if should_backup and not simular:
+        if should_backup and not simulate:
             backup_file = self.backup_manager.create_backup(
                 directory, operation_name
             )

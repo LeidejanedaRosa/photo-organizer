@@ -168,14 +168,14 @@ class PhotoOrganizerCLI:
         print("🔍 DETECTANDO E MOVENDO DUPLICATAS...")
 
         moved = self.service.detect_and_move_duplicates(
-            images, directory, simular=True
+            images, directory, simulate=True
         )
 
         if moved > 0 and self.menu.confirm_operation(
             "Confirma mover duplicatas?"
         ):
             self.service.detect_and_move_duplicates(
-                images, directory, simular=False
+                images, directory, simulate=False
             )
         elif moved == 0:
             print("✅ Nenhuma duplicate encontrada!")
@@ -197,11 +197,11 @@ class PhotoOrganizerCLI:
         ):
             events = EventManager.request_events()
 
-        self.service.rename_images(images, directory, events, simular=True)
+        self.service.rename_images(images, directory, events, simulate=True)
 
         if self.menu.confirm_operation("Confirma as alterações?"):
             self.service.rename_images(
-                images, directory, events, simular=False
+                images, directory, events, simulate=False
             )
 
             if events:
@@ -223,13 +223,13 @@ class PhotoOrganizerCLI:
         all_images = unorganized_images + organized_images
 
         moved_duplicates = self.service.detect_and_move_duplicates(
-            all_images, directory, simular=True
+            all_images, directory, simulate=True
         )
         if moved_duplicates > 0 and self.menu.confirm_operation(
             "Mover duplicatas?"
         ):
             self.service.detect_and_move_duplicates(
-                all_images, directory, simular=False
+                all_images, directory, simulate=False
             )
 
         if unorganized_images:
@@ -244,12 +244,12 @@ class PhotoOrganizerCLI:
                 events = EventManager.request_events()
 
             self.service.rename_images(
-                unorganized_images, directory, events, simular=True
+                unorganized_images, directory, events, simulate=True
             )
 
             if self.menu.confirm_operation("Confirma renomeação?"):
                 self.service.rename_images(
-                    unorganized_images, directory, events, simular=False
+                    unorganized_images, directory, events, simulate=False
                 )
 
     def _option_report(self, images: List[ImageInfo]) -> None:
@@ -285,13 +285,13 @@ class PhotoOrganizerCLI:
         print("📁 ORGANIZANDO POR PASTAS DE EVENTOS...")
 
         moved = self.service.organize_by_events(
-            images, directory, simular=True
+            images, directory, simulate=True
         )
 
         if moved > 0 and self.menu.confirm_operation(
             "Confirma a organização por pastas?"
         ):
-            self.service.organize_by_events(images, directory, simular=False)
+            self.service.organize_by_events(images, directory, simulate=False)
         elif moved == 0:
             print("📋 Nenhum evento detectado nos nomes dos arquivos.")
             print(
@@ -306,13 +306,13 @@ class PhotoOrganizerCLI:
         print("💡 Esta opção mantém compatibilidade com sistema anterior")
 
         years_dict = self.service.organize_by_years(
-            images, directory, simular=True
+            images, directory, simulate=True
         )
 
         if years_dict and self.menu.confirm_operation(
             "Confirma a organização por anos?"
         ):
-            self.service.organize_by_years(images, directory, simular=False)
+            self.service.organize_by_years(images, directory, simulate=False)
         elif not years_dict:
             print(
                 "📅 Nenhuma imagem com date válida para organização por anos."
@@ -341,7 +341,7 @@ class PhotoOrganizerCLI:
 
         print("\n🔍 Simulando organização...")
         result = self.service.organize_by_custom_periods(
-            images, directory, self.configuration, simular=True
+            images, directory, self.configuration, simulate=True
         )
 
         if not result:
@@ -355,7 +355,7 @@ class PhotoOrganizerCLI:
         if self.menu.confirm_operation("Executar organização por períodos?"):
             print("\n� Executando organização...")
             self.service.organize_by_custom_periods(
-                images, directory, self.configuration, simular=False
+                images, directory, self.configuration, simulate=False
             )
             print("✅ Organização concluída!")
 
@@ -364,12 +364,12 @@ class PhotoOrganizerCLI:
         print("⚙️  CONFIGURAÇÃO PERSONALIZADA")
         print("=" * 50)
 
-        opcoes = [
+        options = [
             "1️⃣  Configurar novo projeto personalizado",
             "2️⃣  Visualizar configuração atual",
         ]
 
-        for option in opcoes:
+        for option in options:
             print(f"   {option}")
 
         choice = input("\n🔢 Escolha uma opção (1-2): ").strip()
@@ -433,11 +433,11 @@ class PhotoOrganizerCLI:
             all_updated = updated_images
 
             moved = self.service.organize_by_events(
-                all_updated, directory, simular=True
+                all_updated, directory, simulate=True
             )
             if moved > 0 and self.menu.confirm_operation(
                 "Confirma a organização?"
             ):
                 self.service.organize_by_events(
-                    all_updated, directory, simular=False
+                    all_updated, directory, simulate=False
                 )

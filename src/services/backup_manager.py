@@ -1,13 +1,9 @@
 import json
 import os
 from datetime import datetime
-from typing import List
-
-from ..domain.image import ImageInfo
 
 
 class BackupManager:
-
     def create_backup(self, directory: str, operacao: str) -> str:
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -20,13 +16,13 @@ class BackupManager:
             backup_dir, f"backup_{operacao}_{timestamp}.json"
         )
 
-        arquivos_atuais = []
+        current_files = []
         for file in os.listdir(directory):
-            caminho = os.path.join(directory, file)
-            if os.path.isfile(caminho) and not file.endswith(".json"):
+            path = os.path.join(directory, file)
+            if os.path.isfile(path) and not file.endswith(".json"):
                 try:
-                    stat = os.stat(caminho)
-                    arquivos_atuais.append(
+                    stat = os.stat(path)
+                    current_files.append(
                         {
                             "nome": file,
                             "tamanho": stat.st_size,
@@ -42,7 +38,7 @@ class BackupManager:
             "operacao": operacao,
             "timestamp": timestamp,
             "directory": directory,
-            "arquivos": arquivos_atuais,
+            "arquivos": current_files,
         }
 
         with open(backup_file, "w", encoding="utf-8") as f:

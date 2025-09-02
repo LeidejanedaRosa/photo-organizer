@@ -9,7 +9,7 @@ class ProjectConfiguration:
         start_date: datetime,
         end_date: Optional[datetime] = None,
         naming_prefix: str = "IMG",
-        separador: str = " - ",
+        separator: str = " - ",
         include_period: bool = True,
         include_sequential: bool = True,
         date_format: str = "%d%m%Y",
@@ -18,7 +18,7 @@ class ProjectConfiguration:
         self.start_date = start_date
         self.end_date = end_date
         self.naming_prefix = naming_prefix
-        self.separador = separador
+        self.separator = separator
         self.include_period = include_period
         self.include_sequential = include_sequential
         self.date_format = date_format
@@ -31,10 +31,10 @@ class ProjectConfiguration:
         if date < self.start_date:
             return 0
 
-        anos_diff = date.year - self.start_date.year
-        meses_diff = anos_diff * 12 + (date.month - self.start_date.month)
+        years_diff = date.year - self.start_date.year
+        months_diff = years_diff * 12 + (date.month - self.start_date.month)
 
-        return self.start_date.day + meses_diff
+        return self.start_date.day + months_diff
 
     def calculate_year_number(self, date: datetime) -> int:
 
@@ -44,15 +44,15 @@ class ProjectConfiguration:
         if date < self.start_date:
             return 0
 
-        anos_passados = date.year - self.start_date.year
-        aniversario_atual = datetime(
+        years_past = date.year - self.start_date.year
+        current_birthday = datetime(
             date.year, self.start_date.month, self.start_date.day
         )
 
-        if date >= aniversario_atual:
-            return anos_passados + 1
+        if date >= current_birthday:
+            return years_past + 1
         else:
-            return anos_passados if anos_passados > 0 else 1
+            return years_past if years_past > 0 else 1
 
     def is_date_in_range(self, date: datetime) -> bool:
 
@@ -71,58 +71,58 @@ class ProjectConfiguration:
         return False
 
     def suggest_new_period_config(
-        self, date: datetime
+        self
     ) -> "ProjectConfiguration":
 
         if not self.end_date:
             raise ValueError(
-                "Não é possível sugerir novo período sem date final definida"
+                "Não é possível sugerir novo período sem data final definida"
             )
 
-        nova_data_inicio = self.end_date + timedelta(days=1)
+        new_start_date = self.end_date + timedelta(days=1)
 
         try:
-            nova_data_final = nova_data_inicio.replace(
-                year=nova_data_inicio.year + 1
+            new_end_date = new_start_date.replace(
+                year=new_start_date.year + 1
             ) - timedelta(days=1)
         except ValueError:
 
-            nova_data_final = datetime(nova_data_inicio.year + 1, 2, 28)
+            new_end_date = datetime(new_start_date.year + 1, 2, 28)
 
         return ProjectConfiguration(
-            start_date=nova_data_inicio,
-            end_date=nova_data_final,
+            start_date=new_start_date,
+            end_date=new_end_date,
             naming_prefix=self.naming_prefix,
-            separador=self.separador,
+            separator=self.separator,
             include_period=self.include_period,
             include_sequential=self.include_sequential,
             date_format=self.date_format,
         )
 
     def generate_filename_pattern(
-        self, date: datetime, sequential: int = 0, evento: Optional[str] = None
+        self, date: datetime, sequential: int = 0, event: Optional[str] = None
     ) -> str:
 
-        componentes = []
+        components = []
 
         if self.include_period:
             period = self.calculate_period_number(date)
-            componentes.append(f"{period:02d}")
+            components.append(f"{period:02d}")
 
         if self.naming_prefix:
-            componentes.append(self.naming_prefix)
+            components.append(self.naming_prefix)
 
-        componentes.append(date.strftime(self.date_format))
+        components.append(date.strftime(self.date_format))
 
-        nome_base = self.separador.join(componentes)
+        base_name = self.separator.join(components)
 
         if self.include_sequential:
-            nome_base += f"({sequential:02d})"
+            base_name += f"({sequential:02d})"
 
-        if evento:
-            nome_base += f"{self.separador}{evento}"
+        if event:
+            base_name += f"{self.separator}{event}"
 
-        return nome_base
+        return base_name
 
 
 class ConfigurationManager:
@@ -156,7 +156,7 @@ class ConfigurationManager:
             start_date=start_date,
             end_date=end_date,
             naming_prefix=prefix,
-            separador=" - ",
+            separator=" - ",
             include_period=include_period,
             include_sequential=True,
             date_format="%d%m%Y",
@@ -171,28 +171,28 @@ class ConfigurationManager:
 
         while True:
             try:
-                data_str = input("📅 Data de início (DD/MM/AAAA): ").strip()
-                start_date = datetime.strptime(data_str, "%d/%m/%Y")
+                date_str = input("📅 Data de início (DD/MM/AAAA): ").strip()
+                start_date = datetime.strptime(date_str, "%d/%m/%Y")
                 break
             except ValueError:
                 print("❌ Data inválida. Use o formato DD/MM/AAAA")
 
-        data_final_sugerida = start_date.replace(year=start_date.year + 1)
-        data_final_sugerida = data_final_sugerida - timedelta(days=1)
+        suggested_end_date = start_date.replace(year=start_date.year + 1)
+        suggested_end_date = suggested_end_date - timedelta(days=1)
         print(
             f"\n📅 Data final sugerida: "
-            f"{data_final_sugerida.strftime('%d/%m/%Y')} (exato 1 ano)"
+            f"{suggested_end_date.strftime('%d/%m/%Y')} (exato 1 ano)"
         )
 
-        data_final_input = input(
+        final_input_date = input(
             "📅 Data final personalizada (DD/MM/AAAA) "
             "[Enter para usar sugerida]: "
         ).strip()
 
         end_date = None
-        if data_final_input:
+        if final_input_date:
             try:
-                end_date = datetime.strptime(data_final_input, "%d/%m/%Y")
+                end_date = datetime.strptime(final_input_date, "%d/%m/%Y")
                 print(
                     f"✅ Data final definida: "
                     f"{end_date.strftime('%d/%m/%Y')}"
@@ -214,26 +214,26 @@ class ConfigurationManager:
                 f"{end_date.strftime('%d/%m/%Y')}"
             )
 
-        prefixo_input = input(
-            "\n🏷️  Prefixo da nomenclatura [Enter para 'IMG']: "
+        prefix_input = input(
+            "\n🏷️  prefix da nomenclatura [Enter para 'IMG']: "
         ).strip()
-        prefix = prefixo_input if prefixo_input else "IMG"
+        prefix = prefix_input if prefix_input else "IMG"
 
         print("\n📊 NUMERAÇÃO SEQUENCIAL:")
         print("   ✅ COM números: 00-FOTO-date, 01-FOTO-date (cronológica)")
-        print("   ❌ SEM números: FOTO-date (ordem alfabética quebrada)")
-        incluir_periodo_input = (
-            input("📊 Incluir numeração sequential? (S/n): ").strip().lower()
+        print("   ❌ SEM números: FOTO-date (ordem cronológica quebrada)")
+        include_period_input = (
+            input("📊 Incluir numeração sequencial? (S/n): ").strip().lower()
         )
-        include_period = incluir_periodo_input not in ["n", "nao", "no", "não"]
+        include_period = include_period_input not in ["n", "nao", "no", "não"]
 
         print("\n✅ Configuração criada com sucesso!")
         print(f"   📅 Período: {start_date.strftime('%d/%m/%Y')}", end="")
         if end_date:
             print(f" até {end_date.strftime('%d/%m/%Y')}")
         else:
-            print(" (sem date final)")
-        print(f"   🏷️  Prefixo: {prefix}")
+            print(" (sem data final)")
+        print(f"   🏷️ Prefixo: {prefix}")
         print(f"   📊 Período: {'Sim' if include_period else 'Não'}")
         print()
 
@@ -241,7 +241,7 @@ class ConfigurationManager:
             start_date=start_date,
             end_date=end_date,
             naming_prefix=prefix,
-            separador=" - ",
+            separator=" - ",
             include_period=include_period,
             include_sequential=True,
             date_format="%d%m%Y",

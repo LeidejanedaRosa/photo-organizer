@@ -3,34 +3,35 @@ import os
 from datetime import datetime
 from typing import List, Optional
 
-from PIL import Image
-from PIL.ExifTags import TAGS
+from PIL import Image, ExifTags
+# from PIL import 
+# from PIL.ExifTags import TAGS
 
-from ..domain.image import ImageInfo
+from src.domain.image import ImageInfo
 
 
 class ImageAnalyzer:
 
-    def analyze_image(self, caminho: str) -> Optional[ImageInfo]:
+    def analyze_image(self, path: str) -> Optional[ImageInfo]:
 
         try:
-            with Image.open(caminho) as img:
-                data_mod = datetime.fromtimestamp(os.path.getmtime(caminho))
+            with Image.open(path) as img:
+                data_mod = datetime.fromtimestamp(os.path.getmtime(path))
                 fmt = img.format or "Desconhecido"
-                hash_imagem = self._calculate_image_hash(caminho)
+                hash_image = self._calculate_image_hash(path)
 
                 return ImageInfo(
-                    file=os.path.basename(caminho),
-                    formato=fmt,
+                    file=os.path.basename(path),
+                    format=fmt,
                     dimensions=img.size,
-                    modo=img.mode,
-                    tamanho=os.path.getsize(caminho),
+                    mode=img.mode,
+                    size=os.path.getsize(path),
                     data_mod=data_mod,
                     data_exif=self._extract_exif_date(img),
-                    hash_imagem=hash_imagem,
+                    hash_image=hash_image,
                 )
         except (IOError, OSError) as e:
-            print(f"Não foi possível ler '{os.path.basename(caminho)}': {e}")
+            print(f"Não foi possível ler '{os.path.basename(path)}': {e}")
             return None
 
     def _extract_exif_date(self, img: Image.Image) -> Optional[datetime]:
@@ -39,25 +40,25 @@ class ImageAnalyzer:
             exif = img.getexif()
             if exif is not None:
                 for tag_id in exif:
-                    tag = TAGS.get(tag_id, tag_id)
+                    tag = ExifTags.TAGS.get(tag_id, tag_id)
                     date = exif.get(tag_id)
-                    if tag == "DateTimeOriginal":
-                        return datetime.strptime(date, "%Y:%m:%d %H:%M:%S")
+                    if tag == "DateTimeOriginal" and date:
+                        return datetime.strptime(str(date), "%Y:%m:%d %H:%M:%S")
         except (AttributeError, ValueError, TypeError):
             return None
         return None
 
-    def _calculate_image_hash(self, caminho: str) -> str:
+    def _calculate_image_hash(self, path: str) -> str:
 
         hasher = hashlib.md5()
         try:
-            with Image.open(caminho) as img:
+            with Image.open(path) as img:
                 if img.mode != "RGB":
                     img = img.convert("RGB")
                 img_bytes = img.tobytes()
                 hasher.update(img_bytes)
         except (IOError, OSError) as e:
-            print(f"Erro ao calcular hash de {caminho}: {e}")
+            print(f"Erro ao calcular hash de {path}: {e}")
             return ""
         return hasher.hexdigest()
 
@@ -66,9 +67,9 @@ class ImageAnalyzer:
         images = []
 
         for file in os.listdir(directory):
-            caminho = os.path.join(directory, file)
-            if os.path.isfile(caminho):
-                info = self.analyze_image(caminho)
+            path = os.path.join(directory, file)
+            if os.path.isfile(path):
+                info = self.analyze_image(path)
                 if info:
                     images.append(info)
 

@@ -35,25 +35,25 @@ class PhotoOrganizerService:
 
         all_images = self.image_analyzer.analyze_directory(directory)
 
-        imagens_organizadas = []
-        imagens_nao_organizadas = []
+        organized_images = []
+        unorganized_images = []
 
         for img in all_images:
             if self.filename_generator.is_organized(img.file):
-                imagens_organizadas.append(img)
+                organized_images.append(img)
             else:
-                imagens_nao_organizadas.append(img)
+                unorganized_images.append(img)
 
         def sort_by_date(x):
             return x.preferred_date
 
-        imagens_organizadas.sort(key=sort_by_date)
-        imagens_nao_organizadas.sort(key=sort_by_date)
+        organized_images.sort(key=sort_by_date)
+        unorganized_images.sort(key=sort_by_date)
 
-        return imagens_nao_organizadas, imagens_organizadas
+        return unorganized_images, organized_images
 
     def detect_and_move_duplicates(
-        self, images: List[ImageInfo], directory: str, simular: bool = True
+        self, images: List[ImageInfo], directory: str, simulate: bool = True
     ) -> int:
 
         return self.operation_manager.execute_with_backup(
@@ -63,16 +63,16 @@ class PhotoOrganizerService:
             bool(images),
             images,
             directory,
-            simular=simular,
+            simulate=simulate,
         )
 
     def _execute_duplicate_detection(
-        self, images: List[ImageInfo], directory: str, simular: bool = True
+        self, images: List[ImageInfo], directory: str, simulate: bool = True
     ) -> int:
 
-        duplicadas = self.duplicate_manager.find_duplicates(images)
+        duplicates = self.duplicate_manager.find_duplicates(images)
         return self.duplicate_manager.move_duplicates(
-            duplicadas, directory, simular
+            duplicates, directory, simulate
         )
 
     def rename_images(
@@ -80,7 +80,7 @@ class PhotoOrganizerService:
         images: List[ImageInfo],
         directory: str,
         events: Optional[Dict[str, str]] = None,
-        simular: bool = True,
+        simulate: bool = True,
     ) -> int:
 
         return self.operation_manager.execute_with_backup(
@@ -91,11 +91,11 @@ class PhotoOrganizerService:
             images,
             directory,
             events,
-            simular=simular,
+            simulate=simulate,
         )
 
     def organize_by_years(
-        self, images: List[ImageInfo], directory: str, simular: bool = True
+        self, images: List[ImageInfo], directory: str, simulate: bool = True
     ) -> Dict[int, List[ImageInfo]]:
 
         return self.operation_manager.execute_with_backup(
@@ -105,33 +105,31 @@ class PhotoOrganizerService:
             bool(images),
             images,
             directory,
-            simular=simular,
+            simulate=simulate,
         )
 
     def organize_by_events(
-        self, images: List[ImageInfo], directory: str, simular: bool = True
+        self, images: List[ImageInfo], directory: str, simulate: bool = True
     ) -> int:
 
-        eventos_detectados = self.folder_organizer.detect_events_in_files(
-            images
-        )
+        detected_events = self.folder_organizer.detect_events_in_files(images)
 
         return self.operation_manager.execute_with_backup(
             self._execute_organize_by_events,
             directory,
             "organizar_eventos",
-            bool(eventos_detectados),
+            bool(detected_events),
             directory,
-            eventos_detectados,
-            simular=simular,
+            detected_events,
+            simulate=simulate,
         )
 
     def _execute_organize_by_events(
-        self, directory: str, eventos_detectados: Dict, simular: bool = True
+        self, directory: str, detected_events: Dict, simulate: bool = True
     ) -> int:
 
         return self.folder_organizer.organize_by_events(
-            directory, eventos_detectados, simular
+            directory, detected_events, simulate
         )
 
     def organize_by_custom_periods(
@@ -139,17 +137,17 @@ class PhotoOrganizerService:
         images: List[ImageInfo],
         directory: str,
         configuration: "ProjectConfiguration",
-        simular: bool = True,
+        simulate: bool = True,
     ) -> Dict[str, List[ImageInfo]]:
 
-        if not simular and images:
+        if not simulate and images:
             backup_file = self.backup_manager.create_backup(
                 directory, "organizar_periodos"
             )
             print(f"💾 Backup criado: {backup_file}")
 
         return self.folder_organizer.organize_by_custom_periods(
-            images, directory, configuration, simular
+            images, directory, configuration, simulate
         )
 
     def generate_report(self, images: List[ImageInfo]) -> None:
@@ -170,37 +168,37 @@ class PhotoOrganizerService:
 
     def print_analysis_statistics(
         self,
-        imagens_nao_organizadas: List[ImageInfo],
-        imagens_organizadas: List[ImageInfo],
+        unorganized_images: List[ImageInfo],
+        organized_images: List[ImageInfo],
     ) -> None:
 
-        total_imagens = len(imagens_nao_organizadas) + len(imagens_organizadas)
+        total_images = len(unorganized_images) + len(organized_images)
 
         print("\n📊 ESTATÍSTICAS:")
-        print(f"Total de images encontradas: {total_imagens}")
-        print(f"Já organizadas: {len(imagens_organizadas)}")
-        print(f"Precisam ser organizadas: {len(imagens_nao_organizadas)}")
+        print(f"Total de images encontradas: {total_images}")
+        print(f"Já organizadas: {len(organized_images)}")
+        print(f"Precisam ser organizadas: {len(unorganized_images)}")
 
-        if imagens_organizadas:
-            print(f"\n✅ IMAGENS JÁ ORGANIZADAS ({len(imagens_organizadas)}):")
-            for img in imagens_organizadas:
+        if organized_images:
+            print(f"\n✅ IMAGENS JÁ ORGANIZADAS ({len(organized_images)}):")
+            for img in organized_images:
                 print(f"  - {img.file}")
 
-        if not imagens_nao_organizadas:
+        if not unorganized_images:
             print("\n🎉 Todas as images já estão organizadas!")
             return
 
-        print(f"\n📋 IMAGENS PARA ORGANIZAR ({len(imagens_nao_organizadas)}):")
-        self._print_image_details(imagens_nao_organizadas)
+        print(f"\n📋 IMAGENS PARA ORGANIZAR ({len(unorganized_images)}):")
+        self._print_image_details(unorganized_images)
 
     def _print_image_details(self, images: List[ImageInfo]) -> None:
 
         for img in images:
             print(f"Arquivo: {img.file}")
-            print(f"Formato: {img.formato}")
+            print(f"Formato: {img.format}")
             print(f"Dimensões: {img.dimensions}")
-            print(f"Modo: {img.modo}")
-            print(f"Tamanho (bytes): {img.tamanho}")
+            print(f"Modo: {img.mode}")
+            print(f"Tamanho (bytes): {img.size}")
             print(
                 f"Data de modificação: "
                 f"{img.data_mod.strftime('%d/%m/%Y %H:%M:%S')}"

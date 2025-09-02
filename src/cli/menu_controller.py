@@ -24,8 +24,8 @@ class MenuController:
             print()
             print("📊 INFORMAÇÕES:")
             print("   5️⃣  Ver relatório das suas fotos")
-            opcoes_validas = ["1", "2", "3", "4", "5"]
-            max_opcao = 5
+            valid_options = ["1", "2", "3", "4", "5"]
+            max_option = 5
         else:
 
             print("🔧 ORGANIZAÇÃO:")
@@ -44,21 +44,21 @@ class MenuController:
             print()
             print("💾 BACKUP:")
             print("   9️⃣  Criar backup do estado atual")
-            opcoes_validas = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
-            max_opcao = 9
+            valid_options = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+            max_option = 9
 
         print("=" * 70)
 
         while True:
             try:
                 option = input(
-                    f"\n🔢 Escolha uma opção (1-{max_opcao}): "
+                    f"\n🔢 Escolha uma opção (1-{max_option}): "
                 ).strip()
-                if option in opcoes_validas:
+                if option in valid_options:
                     return int(option)
                 else:
                     print(
-                        f"❌ Opção inválida! Digite um número de 1 a {max_opcao}."
+                        f"❌ Opção inválida! Digite um número de 1 a {max_option}."
                     )
             except KeyboardInterrupt:
                 print("\n\n👋 Operação cancelada pelo usuário.")
@@ -70,10 +70,10 @@ class MenuController:
         print("\n📁 CONFIGURAÇÃO DO DIRETÓRIO:")
 
         while True:
-            caminho = input("📁 Digite o caminho do diretório: ").strip()
-            if caminho and os.path.exists(caminho):
-                return caminho
-            elif not caminho:
+            path = input("📁 Digite o caminho do diretório: ").strip()
+            if path and os.path.exists(path):
+                return path
+            elif not path:
                 print("❌ Por favor, digite um caminho válido!")
             else:
                 print("❌ Diretório não encontrado! Tente novamente.")
@@ -81,8 +81,8 @@ class MenuController:
     @staticmethod
     def confirm_operation(message: str) -> bool:
 
-        resposta = input(f"\n❓ {message} (s/N): ").strip().lower()
-        return resposta == "s"
+        response = input(f"\n❓ {message} (s/N): ").strip().lower()
+        return response == "s"
 
     @staticmethod
     def request_period() -> tuple[str, str]:
@@ -93,11 +93,11 @@ class MenuController:
         return start_date, end_date
 
     @staticmethod
-    def print_separator(titulo: Optional[str] = None) -> None:
+    def print_separator(title: Optional[str] = None) -> None:
 
         print("\n" + "=" * 70)
-        if titulo:
-            print(titulo)
+        if title:
+            print(title)
             print("=" * 70)
 
     @staticmethod

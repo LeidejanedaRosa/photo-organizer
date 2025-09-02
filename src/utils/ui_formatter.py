@@ -8,9 +8,9 @@ class UIFormatter:
     SEPARATOR_THICK = "─" * 70
 
     @staticmethod
-    def print_operation_header(operation_name: str, simular: bool = True):
+    def print_operation_header(operation_name: str, simulate: bool = True):
 
-        mode = "🔄 SIMULAÇÃO" if simular else "📁 EXECUTANDO"
+        mode = "🔄 SIMULAÇÃO" if simulate else "📁 EXECUTANDO"
         print(f"\n{mode}: {operation_name}...")
 
     @staticmethod
@@ -23,11 +23,11 @@ class UIFormatter:
         operation_name: str,
         count: int,
         item_type: str = "itens",
-        simular: bool = True,
+        simulate: bool = True,
     ):
 
         UIFormatter.print_separator()
-        if simular:
+        if simulate:
             print(f"📊 PREVISÃO: {count} {item_type} seriam processados")
         else:
             print(f"📊 RESULTADO: {count} {item_type} processados")

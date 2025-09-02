@@ -1,4 +1,3 @@
-import os
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -9,22 +8,22 @@ class ImageInfo:
     def __init__(
         self,
         file: str,
-        formato: Optional[str],
+        format: Optional[str],
         dimensions: tuple,
-        modo: str,
-        tamanho: int,
+        mode: str,
+        size: int,
         data_mod: datetime,
         data_exif: Optional[datetime] = None,
-        hash_imagem: Optional[str] = None,
+        hash_image: Optional[str] = None,
     ):
         self.file = file
-        self.formato = formato
+        self.format = format
         self.dimensions = dimensions
-        self.modo = modo
-        self.tamanho = tamanho
+        self.mode = mode
+        self.size = size
         self.data_mod = data_mod
         self.data_exif = data_exif
-        self.hash_imagem = hash_imagem
+        self.hash_image = hash_image
 
     @property
     def preferred_date(self) -> datetime:
@@ -37,7 +36,7 @@ class ImageInfo:
         return Path(self.file).suffix
 
     @property
-    def nome_sem_extensao(self) -> str:
+    def name_without_extension(self) -> str:
 
         return Path(self.file).stem
 
@@ -46,8 +45,8 @@ class ImageInfo:
         if not isinstance(other, ImageInfo):
             return False
         return (
-            self.hash_imagem == other.hash_imagem
-            and self.hash_imagem is not None
+            self.hash_image == other.hash_image
+            and self.hash_image is not None
         )
 
     def __hash__(self):
@@ -65,28 +64,28 @@ class PeriodCalculator:
         if date < self.start_date:
             return 0
 
-        anos_passados = date.year - self.start_date.year
-        aniversario_atual = datetime(
+        years_gone_by = date.year - self.start_date.year
+        current_birthday = datetime(
             date.year, self.start_date.month, self.start_date.day
         )
 
-        if date >= aniversario_atual:
-            return anos_passados + 1
+        if date >= current_birthday:
+            return years_gone_by + 1
         else:
-            return anos_passados if anos_passados > 0 else 1
+            return years_gone_by if years_gone_by > 0 else 1
 
     def calculate_month(self, date: datetime) -> int:
 
         if date < self.start_date:
             return 0
 
-        anos_diff = date.year - self.start_date.year
-        meses_diff = anos_diff * 12 + (date.month - self.start_date.month)
+        years_diff = date.year - self.start_date.year
+        months_diff = years_diff * 12 + (date.month - self.start_date.month)
 
         if date.day >= self.start_date.day:
-            return meses_diff
+            return months_diff
         else:
-            return meses_diff - 1 if meses_diff > 0 else 0
+            return months_diff - 1 if months_diff > 0 else 0
 
 
 class Event:

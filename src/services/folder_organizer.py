@@ -2,7 +2,7 @@ import os
 import shutil
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from ..domain.configuration import ProjectConfiguration
 from ..domain.image import ImageInfo
@@ -17,14 +17,13 @@ class YearOrganizer(BaseOrganizer):
         self, images: List[ImageInfo]
     ) -> Dict[str, List[ImageInfo]]:
 
-        imagens_por_ano = defaultdict(list)
+        images_by_year = defaultdict(list)
 
         for img in images:
-            date = img.preferred_date
-            ano = date.year
-            imagens_por_ano[f"Ano {ano}"].append(img)
+            year = img.preferred_date.year
+            images_by_year[f"Ano {year}"].append(img)
 
-        return dict(imagens_por_ano)
+        return dict(images_by_year)
 
     def _get_operation_name(self) -> str:
         return "Organizando por anos"
@@ -42,49 +41,49 @@ class EventOrganizer:
     def organize_by_events(
         self,
         directory: str,
-        eventos_detectados: Dict[str, List[str]],
-        simular: bool = True,
+        detected_events: Dict[str, List[str]],
+        simulate: bool = True,
     ) -> int:
 
-        if not eventos_detectados:
+        if not detected_events:
             print("📋 Nenhum evento detectado nos nomes dos arquivos.")
             return 0
 
         self.ui_formatter.print_operation_header(
-            "Organizando por eventos", simular
+            "Organizando por eventos", simulate
         )
         self.ui_formatter.print_separator()
 
         total_moved = 0
 
-        for evento, arquivos in eventos_detectados.items():
-            pasta_evento = os.path.join(directory, evento)
+        for event, files in detected_events.items():
+            event_folder = os.path.join(directory, event)
 
             self.ui_formatter.print_group_header(
-                evento, len(arquivos), "arquivo(s)"
+                event, len(files), "arquivo(s)"
             )
 
-            if not simular:
+            if not simulate:
                 self.file_manager.create_directory_if_not_exists(
-                    pasta_evento, evento
+                    event_folder, event
                 )
             else:
-                print(f"   📁 Criaria pasta: {evento}/")
+                print(f"   📁 Criaria pasta: {event}/")
 
-            for arquivo in arquivos:
-                origem = os.path.join(directory, arquivo)
-                destino = os.path.join(pasta_evento, arquivo)
+            for file in files:
+                source = os.path.join(directory, file)
+                destination = os.path.join(event_folder, file)
 
                 if self.file_manager.move_single_file(
-                    origem, destino, arquivo, simular
+                    source, destination, file, simulate
                 ):
-                    if not simular:
+                    if not simulate:
                         total_moved += 1
                 else:
-                    total_moved += 1 if simular else 0
+                    total_moved += 1 if simulate else 0
 
         self.ui_formatter.print_operation_result(
-            "Organização por eventos", total_moved, "arquivos", simular
+            "Organização por eventos", total_moved, "arquivos", simulate
         )
 
         return total_moved
@@ -99,10 +98,10 @@ class FolderOrganizer:
         self.file_manager = FileManager()
 
     def organize_by_years(
-        self, images: List[ImageInfo], directory: str, simular: bool = True
+        self, images: List[ImageInfo], directory: str, simulate: bool = True
     ) -> Dict[int, List[ImageInfo]]:
 
-        result = self.year_organizer.organize(images, directory, simular)
+        result = self.year_organizer.organize(images, directory, simulate)
 
         converted_result = {}
         for key, value in result.items():
@@ -114,19 +113,19 @@ class FolderOrganizer:
     def organize_by_events(
         self,
         directory: str,
-        eventos_detectados: Dict[str, List[str]],
-        simular: bool = True,
+        detected_events: Dict[str, List[str]],
+        simulate: bool = True,
     ) -> int:
 
         return self.event_organizer.organize_by_events(
-            directory, eventos_detectados, simular
+            directory, detected_events, simulate
         )
 
     def detect_events_in_files(
         self, images: List[ImageInfo]
     ) -> Dict[str, List[str]]:
 
-        eventos = defaultdict(list)
+        events = defaultdict(list)
 
         for img in images:
             filename = Path(img.file).stem
@@ -136,16 +135,16 @@ class FolderOrganizer:
                 if len(parts) >= 2:
                     event_part = " - ".join(parts[1:])
                     if event_part and not event_part.isdigit():
-                        eventos[event_part].append(img.file)
+                        events[event_part].append(img.file)
 
-        return dict(eventos)
+        return dict(events)
 
     def organize_by_custom_periods(
         self,
         images: List[ImageInfo],
         directory: str,
         configuration: ProjectConfiguration,
-        simular: bool = True,
+        simulate: bool = True,
     ) -> Dict[str, List[ImageInfo]]:
 
         if not self.ui_formatter.validate_list_not_empty(
@@ -153,8 +152,8 @@ class FolderOrganizer:
         ):
             return {}
 
-        imagens_periodo_atual = []
-        imagens_periodo_futuro = []
+        current_period_images = []
+        future_period_images = []
 
         for img in images:
             period_number = configuration.calculate_period_number(
@@ -163,53 +162,55 @@ class FolderOrganizer:
             if period_number == configuration.calculate_period_number(
                 configuration.start_date
             ):
-                imagens_periodo_atual.append(img)
+                current_period_images.append(img)
             else:
-                imagens_periodo_futuro.append(img)
+                future_period_images.append(img)
 
         self.ui_formatter.print_operation_header(
-            "Organizando por períodos customizados", simular
+            "Organizando por períodos customizados", simulate
         )
         self.ui_formatter.print_separator()
 
         result = {}
 
-        if imagens_periodo_atual:
-            nome_pasta_atual = self._gerar_nome_pasta_periodo(configuration)
-            result[nome_pasta_atual] = imagens_periodo_atual
+        if current_period_images:
+            current_folder_name = self._generate_period_folder_name(
+                configuration
+            )
+            result[current_folder_name] = current_period_images
 
-            if not simular:
-                self._criar_pasta_e_mover(
-                    imagens_periodo_atual, directory, nome_pasta_atual
+            if not simulate:
+                self._create_folder_and_move(
+                    current_period_images, directory, current_folder_name
                 )
 
             print(
-                f"📁 {nome_pasta_atual}: {len(imagens_periodo_atual)} imagens"
+                f"📁 {current_folder_name}: {len(current_period_images)} imagens"
             )
 
-        if imagens_periodo_futuro:
-            # Usar a última data para sugerir novo período
-            ultima_data = max(
-                img.preferred_date for img in imagens_periodo_futuro
-            )
-            nova_config = configuration.suggest_new_period_config(ultima_data)
-            if nova_config:
-                nome_pasta_futura = self._gerar_nome_pasta_periodo(nova_config)
-                result[nome_pasta_futura] = imagens_periodo_futuro
+        if future_period_images:
+            new_config = configuration.suggest_new_period_config()
+            if new_config:
+                future_folder_name = self._generate_period_folder_name(
+                    new_config
+                )
+                result[future_folder_name] = future_period_images
 
-                if not simular:
-                    self._criar_pasta_e_mover(
-                        imagens_periodo_futuro, directory, nome_pasta_futura
+                if not simulate:
+                    self._create_folder_and_move(
+                        future_period_images, directory, future_folder_name
                     )
 
                 print(
-                    f"📁 {nome_pasta_futura}: {len(imagens_periodo_futuro)} imagens"
+                    f"📁 {future_folder_name}: {len(future_period_images)} imagens"
                 )
 
         self.ui_formatter.print_separator()
         return result
 
-    def _gerar_nome_pasta_periodo(self, config: ProjectConfiguration) -> str:
+    def _generate_period_folder_name(
+        self, config: ProjectConfiguration
+    ) -> str:
 
         components = []
 
@@ -222,26 +223,26 @@ class FolderOrganizer:
         date_str = config.start_date.strftime(config.date_format)
         components.append(date_str)
 
-        nome = config.separador.join(components)
+        name = config.separator.join(components)
 
-        return nome
+        return name
 
-    def _criar_pasta_e_mover(
-        self, images: List[ImageInfo], diretorio_base: str, folder_name: str
+    def _create_folder_and_move(
+        self, images: List[ImageInfo], base_directory: str, folder_name: str
     ) -> None:
 
-        pasta_destino = os.path.join(diretorio_base, folder_name)
+        destination_folder = os.path.join(base_directory, folder_name)
 
         self.file_manager.create_directory_if_not_exists(
-            pasta_destino, folder_name
+            destination_folder, folder_name
         )
 
         for img in images:
-            origem = os.path.join(diretorio_base, img.file)
-            destino = os.path.join(pasta_destino, img.file)
+            source = os.path.join(base_directory, img.file)
+            destination = os.path.join(destination_folder, img.file)
 
             try:
-                shutil.move(origem, destino)
+                shutil.move(source, destination)
                 img.file = os.path.join(
                     folder_name, os.path.basename(img.file)
                 )
