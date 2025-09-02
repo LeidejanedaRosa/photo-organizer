@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+from typing import Optional, Tuple
 
 
 class MenuController:
@@ -29,7 +29,10 @@ class MenuController:
         else:
 
             print("🔧 ORGANIZAÇÃO:")
-            print("   1️⃣  Configurar nomenclatura das fotos")
+            if has_configuration:
+                print("   1️⃣  Reconfigurar nomenclatura das fotos")
+            else:
+                print("   1️⃣  Configurar nomenclatura das fotos")
             print("   2️⃣  Remover fotos duplicadas")
             print("   3️⃣  Organizar fotos em ordem cronológica")
             print("   4️⃣  Fazer tudo (duplicatas + renomeação)")
@@ -85,7 +88,7 @@ class MenuController:
         return response == "s"
 
     @staticmethod
-    def request_period() -> tuple[str, str]:
+    def request_period() -> Tuple[str, str]:
 
         print("📅 Digite o período desejado:")
         start_date = input("   📆 Data início (DD/MM/AAAA): ").strip()

@@ -28,9 +28,13 @@ class UIFormatter:
 
         UIFormatter.print_separator()
         if simulate:
-            print(f"📊 PREVISÃO: {count} {item_type} seriam processados")
+            print(
+                f"📊 PREVISÃO [{operation_name}]: {count} {item_type} seriam processados"
+            )
         else:
-            print(f"📊 RESULTADO: {count} {item_type} processados")
+            print(
+                f"📊 RESULTADO [{operation_name}]: {count} {item_type} processados"
+            )
         UIFormatter.print_separator()
 
     @staticmethod

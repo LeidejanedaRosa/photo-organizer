@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Optional
 
-from ..domain.configuration import ConfigurationManager
+from ..domain.configuration import ConfigurationManager, ProjectConfiguration
 from ..domain.image import ImageInfo
 from ..services.photo_organizer_service import PhotoOrganizerService
 from ..utils.event_manager import EventManager
@@ -9,10 +9,10 @@ from .menu_controller import MenuController
 
 class PhotoOrganizerCLI:
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.service = PhotoOrganizerService()
         self.menu = MenuController()
-        self.configuration = None
+        self.configuration: Optional[ProjectConfiguration] = None
 
     def run(self) -> None:
         try:
@@ -34,7 +34,6 @@ class PhotoOrganizerCLI:
                 unorganized_images,
                 organized_images,
                 has_organized_photos,
-                has_configuration,
             )
         except KeyboardInterrupt:
             print("\n\n👋 Programa encerrado pelo usuário.")
@@ -49,7 +48,6 @@ class PhotoOrganizerCLI:
         unorganized_images: List[ImageInfo],
         organized_images: List[ImageInfo],
         has_organized_photos: bool,
-        has_configuration: bool,
     ) -> None:
         self.menu.print_separator()
 
@@ -159,6 +157,7 @@ class PhotoOrganizerCLI:
             print(
                 "✅ Configuração criada! Agora você pode usar as opções 2 e 3."
             )
+            return
         else:
             print("👋 Use a opção 9 quando estiver pronto para configurar.")
 
