@@ -1,7 +1,7 @@
 from typing import List
 
-from ..domain.configuration import ConfigurationManager, ProjectConfiguration
-from ..domain.image import ImageInfo, PeriodCalculator
+from ..domain.configuration import ConfigurationManager
+from ..domain.image import ImageInfo
 from ..services.photo_organizer_service import PhotoOrganizerService
 from ..utils.event_manager import EventManager
 from .menu_controller import MenuController

@@ -1,6 +1,6 @@
 from typing import Dict, List, Optional
 
-from ..domain.configuration import ConfigurationManager, ProjectConfiguration
+from ..domain.configuration import ProjectConfiguration
 from ..domain.image import ImageInfo
 from ..utils.operation_manager import OperationManager
 from .backup_manager import BackupManager

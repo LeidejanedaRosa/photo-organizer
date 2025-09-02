@@ -188,7 +188,11 @@ class FolderOrganizer:
             )
 
         if imagens_periodo_futuro:
-            nova_config = configuration.create_next_period()
+            # Usar a última data para sugerir novo período
+            ultima_data = max(
+                img.preferred_date for img in imagens_periodo_futuro
+            )
+            nova_config = configuration.suggest_new_period_config(ultima_data)
             if nova_config:
                 nome_pasta_futura = self._gerar_nome_pasta_periodo(nova_config)
                 result[nome_pasta_futura] = imagens_periodo_futuro

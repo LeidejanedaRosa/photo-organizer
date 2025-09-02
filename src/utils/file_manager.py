@@ -1,6 +1,6 @@
 import os
 import shutil
-from typing import List
+from typing import List, Optional
 
 from ..domain.image import ImageInfo
 
@@ -9,7 +9,7 @@ class FileManager:
 
     @staticmethod
     def create_directory_if_not_exists(
-        directory_path: str, display_name: str = None
+        directory_path: str, display_name: Optional[str] = None
     ) -> bool:
 
         if not os.path.exists(directory_path):
