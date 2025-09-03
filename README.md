@@ -25,7 +25,18 @@ docker-compose up --build
 1. Create and activate virtual environment:
 ```bash
 python3 -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# On Linux/macOS:
+source .venv/bin/activate
+
+# On Windows PowerShell:
+.venv\Scripts\Activate.ps1
+
+# On Windows CMD:
+.venv\Scripts\activate.bat
+
+# On Windows Git Bash/WSL:
+source .venv/Scripts/activate
 ```
 
 2. Install dependencies:
@@ -105,4 +116,6 @@ photo-organizer/
 
 ## License
 
-MIT License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+SPDX-License-Identifier: MIT
