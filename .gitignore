@@ -89,9 +89,6 @@ Pipfile.lock
 # poetry
 poetry.lock
 
-# pdm
-.pdm.toml
-
 # PEP 582
 __pypackages__/
 
@@ -104,6 +101,12 @@ celerybeat.pid
 
 # Environments
 .env
+.env.*
+.env.local
+.env.*.local
+.env.bak
+.env.local.bak
+.envrc
 .venv
 env/
 venv/
