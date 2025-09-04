@@ -1,121 +1,162 @@
 # Photo Organizer
 
-A Python application for organizing and managing photo collections.
+Um organizador inteligente de fotos e arquivos que separa automaticamente seus arquivos por tipo, mantendo suas imagens organizadas na pasta principal.
 
-## Features
+## 🎯 Funcionalidades
 
-- Photo organization by date, location, or custom criteria
-- Duplicate detection and removal
-- Metadata extraction and management
-- Web interface for easy management
+- **📸 Identificação inteligente** de tipos de arquivo (Imagem, Vídeo, Texto, Outros)
+- **📁 Organização automática** em pastas específicas
+- **🔒 Segurança** - não sobrescreve arquivos existentes
+- **⚡ Interface dupla** - CLI e JSON (preparado para frontend)
+- **🧪 Totalmente testado** com cobertura abrangente
 
-## Development Setup
+## 🚀 Como Usar
 
-### Using Docker (Recommended)
+### Interface de Linha de Comando (CLI)
 
-1. Build and run with Docker Compose:
 ```bash
-docker-compose up --build
+# Analisar arquivos sem organizar
+python3 main.py "/caminho/para/pasta"
+
+# Organizar arquivos automaticamente
+python3 main.py "/caminho/para/pasta" --organize
+
+# Saída em JSON (para integração com frontend)
+python3 main.py "/caminho/para/pasta" --json
+python3 main.py "/caminho/para/pasta" --organize --json
 ```
 
-2. The application will be available at `http://localhost:8000`
+### Como Funciona a Organização
 
-### Local Development
+- **🖼️ Imagens** (JPG, PNG, GIF, etc.) → Permanecem na pasta atual
+- **🎬 Vídeos** (MP4, AVI, MOV, etc.) → Pasta `Videos/`
+- **📄 Textos** (PDF, DOC, TXT, etc.) → Pasta `Textos/`
+- **📦 Outros** (arquivos sem extensão específica) → Pasta `Outros/`
 
-1. Create and activate virtual environment:
+*Pastas são criadas apenas quando há arquivos para mover!*
+
+## 🏗️ Arquitetura (Preparada para Frontend)
+
+O projeto foi estruturado em camadas para facilitar a futura integração com interfaces web:
+
+```
+photo_organizer/
+├── models.py          # Modelos de dados (Request/Response)
+├── service.py         # Lógica de negócio pura
+├── controller.py      # Controladores (preparados para API)
+├── file_handler.py    # Manipulação de arquivos
+├── file_organizer.py  # Organização de arquivos
+└── directory_scanner.py # Escaneamento de diretórios
+```
+
+### Exemplo de Saída JSON
+
+```json
+{
+  "success": true,
+  "message": "Organização concluída! 15 arquivo(s) movido(s).",
+  "data": {
+    "source_folder": "/home/user/fotos",
+    "total_files": 55,
+    "files_by_type": {
+      "Imagem": 40,
+      "Vídeo": 11,
+      "Texto": 1,
+      "Outro": 3
+    },
+    "moved_files": {
+      "Vídeo": 11,
+      "Texto": 1,
+      "Outro": 3
+    },
+    "folders_created": ["Videos", "Textos", "Outros"],
+    "organization_summary": {
+      "total_analyzed": 55,
+      "total_moved": 15,
+      "images_remaining": 40
+    }
+  },
+  "errors": []
+}
+```
+
+## 🌐 Integração com Frontend (Futura)
+
+O projeto está preparado para receber um frontend web. Estrutura sugerida:
+
+### Endpoints Planejados
+
+- `GET /api/analyze/{folder_path}` - Analisa pasta
+- `POST /api/organize` - Organiza arquivos
+- `GET /api/file-types` - Tipos suportados
+- `GET /api/health` - Status da API
+
+### Frameworks Recomendados
+
+- **Backend**: Flask ou FastAPI
+- **Frontend**: React.js, Vue.js, Angular ou Vanilla JS
+- **Exemplo**: Veja `api_example.py` para implementação de referência
+
+## 🧪 Testes
+
 ```bash
-python3 -m venv .venv
+# Executar todos os testes
+python3 -m unittest discover tests -v
 
-# On Linux/macOS:
-source .venv/bin/activate
-
-# On Windows PowerShell:
-.venv\Scripts\Activate.ps1
-
-# On Windows CMD:
-.venv\Scripts\activate.bat
-
-# On Windows Git Bash/WSL:
-source .venv/Scripts/activate
+# Testes específicos
+python3 -m unittest tests.test_file_organizer -v
+python3 -m unittest tests.test_service_and_controller -v
 ```
 
-2. Install dependencies:
+## 📦 Instalação
+
 ```bash
-pip install -r requirements.txt
+# Clone o repositório
+git clone <repository-url>
+cd photo-organizer
+
+# Execute (sem dependências externas!)
+python3 main.py --help
 ```
 
-3. Install development dependencies:
+## 🎯 Exemplos de Uso
+
+### Comando Básico
 ```bash
-pip install -e ".[dev]"
+python3 main.py "/home/user/Downloads"
 ```
 
-4. Set up pre-commit hooks:
+### Organização Completa
 ```bash
-pre-commit install
+python3 main.py "/home/user/Photos" --organize
 ```
 
-5. Run the application:
+### Para Desenvolvimento (JSON)
 ```bash
-python main.py
+python3 main.py "/home/user/Photos" --organize --json | jq '.'
 ```
 
-## Development Tools
+## 🔄 Roadmap
 
-This project uses the following tools for code quality:
+- [x] ✅ CLI funcional
+- [x] ✅ Estrutura para API
+- [x] ✅ Saída JSON
+- [x] ✅ Testes abrangentes
+- [ ] 🔲 API REST (Flask/FastAPI)
+- [ ] 🔲 Interface web
+- [ ] 🔲 Configurações customizáveis
+- [ ] 🔲 Organização por data
+- [ ] 🔲 Preview de arquivos
 
-- **Black**: Code formatter (equivalent to Prettier)
-- **isort**: Import sorting
-- **Flake8**: Linting (equivalent to ESLint)
-- **Pre-commit**: Git hooks (equivalent to Husky)
-- **pytest**: Testing framework
+## 📋 Tipos de Arquivo Suportados
 
-### Running Code Quality Tools
+| Tipo | Extensões | Destino |
+|------|-----------|---------|
+| **Imagem** | `.jpg`, `.jpeg`, `.png`, `.gif`, `.bmp`, `.tiff` | Pasta atual |
+| **Vídeo** | `.mp4`, `.mov`, `.avi`, `.mkv`, `.flv`, `.wmv` | `Videos/` |
+| **Texto** | `.txt`, `.doc`, `.docx`, `.pdf`, `.rtf`, `.odt` | `Textos/` |
+| **Outro** | Demais extensões | `Outros/` |
 
-Format code:
-```bash
-black .
-isort .
-```
+---
 
-Run linting:
-```bash
-flake8
-```
-
-Run tests:
-```bash
-pytest
-```
-
-Run all checks:
-```bash
-pre-commit run --all-files
-```
-
-## Project Structure
-
-```
-photo-organizer/
-├── main.py                 # Application entry point
-├── photo_organizer/        # Main package
-├── tests/                  # Test files
-├── requirements.txt        # Python dependencies
-├── pyproject.toml         # Project configuration
-├── Dockerfile             # Docker configuration
-├── docker-compose.yml     # Docker Compose configuration
-└── .pre-commit-config.yaml # Pre-commit hooks
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run the test suite
-5. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-SPDX-License-Identifier: MIT
+**Photo Organizer** - Mantenha suas fotos organizadas e seus arquivos no lugar certo! 📸✨
