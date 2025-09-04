@@ -1,0 +1,21 @@
+# Modelo de commit semântico
+# <tipo>(<escopo>): <descrição>
+
+# Tipos disponíveis:
+# feat:     Nova funcionalidade
+# fix:      Correção de bug
+# docs:     Alterações na documentação
+# style:    Formatação de código
+# refactor: Refatoração sem mudança funcional
+# test:     Adição ou alteração de testes
+# chore:    Tarefas de manutenção
+# build:    Alterações no sistema de build
+# ci:       Alterações na integração contínua
+# perf:     Melhorias de performance
+# revert:   Reversão de commit anterior
+
+# Exemplos:
+# feat(auth): adicionar autenticação de usuário
+# fix(api): corrigir timeout na requisição
+# docs(readme): atualizar instruções de instalação
+# test(scanner): adicionar testes unitários
