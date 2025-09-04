@@ -2,22 +2,11 @@ import argparse
 import sys
 from pathlib import Path
 
-from photo_organizer.directory_scanner import DirectoryScanner
+from photo_organizer.controller import PhotoOrganizerController
 
 
 def existing_dir(path_str):
-    """
-    Validate and convert a path string to a resolved Path object.
 
-    Args:
-        path_str (str): The path string to validate
-
-    Returns:
-        Path: A resolved Path object pointing to an existing directory
-
-    Raises:
-        argparse.ArgumentTypeError: If the path doesn't exist or isn't a directory
-    """
     path = Path(path_str).expanduser().resolve()
 
     if not path.exists():
@@ -30,11 +19,7 @@ def existing_dir(path_str):
 
 
 def main():
-    """
-    Ponto de entrada principal da aplicação.
 
-    Coordena a análise do diretório e a exibição dos arquivos encontrados.
-    """
     parser = argparse.ArgumentParser(
         description="Organiza fotos e outros arquivos em uma pasta."
     )
@@ -43,27 +28,105 @@ def main():
         type=existing_dir,
         help="A pasta de origem a ser analisada.",
     )
+    parser.add_argument(
+        "--organize",
+        action="store_true",
+        help="Organiza os arquivos em pastas por tipo (Videos, Textos, Outros). Imagens permanecem na pasta atual.",
+    )
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Retorna o resultado em formato JSON (útil para integração com frontend).",
+    )
     args = parser.parse_args()
 
-    source_path = args.source_folder
-
     try:
-        scanner = DirectoryScanner(source_path)
-        files = scanner.scan_files()
+        controller = PhotoOrganizerController()
 
-        print(f"Analisando a pasta: {source_path}")
-        if not files:
-            print("Nenhum arquivo encontrado.")
+        if args.organize:
+            result = controller.organize_files_endpoint(
+                folder_path=str(args.source_folder), organize=True
+            )
         else:
-            for file in files:
-                print(file)
+            result = controller.analyze_folder_endpoint(str(args.source_folder))
 
-    except ValueError as e:
-        print(f"Erro: {e}", file=sys.stderr)
-        sys.exit(1)
+        if args.json:
+            import json
+
+            print(json.dumps(result, indent=2, ensure_ascii=False))
+        else:
+            _print_cli_output(result, args.organize, str(args.source_folder))
+
     except Exception as e:
-        print(f"Erro inesperado: {e}", file=sys.stderr)
+        if hasattr(args, "json") and args.json:
+            import json
+
+            error_result = {
+                "success": False,
+                "message": f"Erro inesperado: {str(e)}",
+                "data": {},
+                "errors": [str(e)],
+            }
+            print(json.dumps(error_result, indent=2, ensure_ascii=False))
+        else:
+            print(f"Erro inesperado: {e}", file=sys.stderr)
         sys.exit(1)
+
+
+def _print_cli_output(result: dict, organize_mode: bool, source_folder: str):
+    """Formata a saída para linha de comando."""
+    if not result["success"]:
+        print(f"Erro: {result['message']}", file=sys.stderr)
+        return
+
+    data = result["data"]
+    print(f"Analisando a pasta: {source_folder}")
+
+    if data["total_files"] == 0:
+        print("Nenhum arquivo encontrado.")
+        return
+
+    print(f"\nArquivos encontrados ({data['total_files']}):")
+    for file_info in data["files"]:
+        print(f"  • Arquivo: {file_info['name']} - Tipo: {file_info['type']}")
+
+    if organize_mode and "organization_summary" in data:
+        print("\n" + "=" * 50)
+        print("INICIANDO ORGANIZAÇÃO DOS ARQUIVOS...")
+        print("=" * 50)
+
+        # Simula o feedback de movimento (já foi feito pelo service)
+        summary = data["organization_summary"]
+
+        print("\n=== RESUMO DA ORGANIZAÇÃO ===")
+        if data.get("folders_created"):
+            print(f"Pastas criadas: {', '.join(data['folders_created'])}")
+        else:
+            print("Nenhuma pasta nova foi criada.")
+
+        print(f"Total de arquivos analisados: {summary['total_analyzed']}")
+
+        if summary["moved_by_type"]:
+            print("Arquivos movidos:")
+            for file_type, count in summary["moved_by_type"].items():
+                folder_name = _get_folder_name(file_type)
+                print(f"  • {count} arquivo(s) de {file_type} -> {folder_name}/")
+        else:
+            print("Nenhum arquivo foi movido.")
+
+        if summary["images_remaining"] > 0:
+            print(
+                f"  • {summary['images_remaining']} imagem(ns) permaneceu(ram) na pasta atual"
+            )
+    elif not organize_mode:
+        print("\nPara organizar os arquivos em pastas, execute:")
+        print(f'python main.py "{source_folder}" --organize')
+
+
+def _get_folder_name(file_type: str) -> str:
+    """Retorna o nome da pasta para um tipo de arquivo."""
+    mapping = {"Vídeo": "Videos", "Texto": "Textos", "Outro": "Outros"}
+    return mapping.get(file_type, "Outros")
 
 
 if __name__ == "__main__":
