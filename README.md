@@ -54,7 +54,7 @@ photo_organizer/
 ```json
 {
   "success": true,
-  "message": "Organização concluída! 15 arquivo(s) movido(s).",
+  "message": "Organização concluída: 15 arquivos movidos.",
   "data": {
     "source_folder": "/home/user/fotos",
     "total_files": 55,
@@ -86,10 +86,11 @@ O projeto está preparado para receber um frontend web. Estrutura sugerida:
 
 ### Endpoints Planejados
 
-- `GET /api/analyze/{folder_path}` - Analisa pasta
+ `GET /api/analyze?path={urlencoded_path}` - Analisa pasta (dentro de um diretório raiz permitido)
 - `POST /api/organize` - Organiza arquivos
 - `GET /api/file-types` - Tipos suportados
 - `GET /api/health` - Status da API
+> Nota: normalize o caminho no backend (join seguro + bloqueio de `..`) e exija que `path` esteja sob um diretório raiz configurado.
 
 ### Frameworks Recomendados
 

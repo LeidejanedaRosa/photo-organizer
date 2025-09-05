@@ -6,20 +6,24 @@ from .file_handler import FileHandler
 
 
 class FileOrganizer:
-
     def __init__(self, base_directory: Path):
-        self.base_directory = base_directory
+        self.base_directory = base_directory.resolve()
         self.folders_created: List[str] = []
+        self.images_remaining_count: int = 0
+        if self.base_directory.exists() and not self.base_directory.is_dir():
+            raise NotADirectoryError(f"Não é um diretório: {self.base_directory}")
+        self.base_directory.mkdir(parents=True, exist_ok=True)
 
     def organize_files(self, files: List[FileHandler]) -> Dict[str, int]:
         files_by_type = self._group_files_by_type(files)
 
+        self.images_remaining_count = len(files_by_type.get("Imagem", []))
         files_by_type.pop("Imagem", None)
 
         moved_files = {}
 
         for file_type, file_list in files_by_type.items():
-            if file_list:  # Só cria pasta se houver arquivos do tipo
+            if file_list:
                 folder_name = self._get_folder_name(file_type)
                 target_folder = self.base_directory / folder_name
 
@@ -33,7 +37,6 @@ class FileOrganizer:
     def _group_files_by_type(
         self, files: List[FileHandler]
     ) -> Dict[str, List[FileHandler]]:
-
         grouped: Dict[str, List[FileHandler]] = {}
         for file in files:
             if file.type not in grouped:
@@ -42,7 +45,6 @@ class FileOrganizer:
         return grouped
 
     def _get_folder_name(self, file_type: str) -> str:
-
         folder_mapping = {"Vídeo": "Videos", "Texto": "Textos", "Outro": "Outros"}
         return folder_mapping.get(file_type, "Outros")
 
@@ -93,12 +95,9 @@ class FileOrganizer:
         else:
             summary.append("Nenhum arquivo foi movido.")
 
-        images_count = (
-            total_files - sum(moved_files.values()) if moved_files else total_files
-        )
-        if images_count > 0:
+        if self.images_remaining_count > 0:
             summary.append(
-                f"  • {images_count} imagem(ns) permaneceu(ram) na pasta atual"
+                f"  • {self.images_remaining_count} imagem(ns) permaneceu(ram) na pasta atual"
             )
 
         return "\n".join(summary)

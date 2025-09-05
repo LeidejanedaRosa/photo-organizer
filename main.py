@@ -2,8 +2,6 @@ import argparse
 import sys
 from pathlib import Path
 
-from photo_organizer.controller import PhotoOrganizerController
-
 
 def existing_dir(path_str):
 
@@ -41,6 +39,8 @@ def main():
     args = parser.parse_args()
 
     try:
+        from photo_organizer.controller import PhotoOrganizerController
+
         controller = PhotoOrganizerController()
 
         if args.organize:

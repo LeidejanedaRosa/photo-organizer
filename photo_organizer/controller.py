@@ -92,12 +92,12 @@ class PhotoOrganizerController:
 
     def _generate_summary(self, result: OrganizationResult) -> Dict[str, Any]:
         total_moved = sum(result.moved_files.values())
-        images_remaining = result.total_files - total_moved
+        files_remaining = result.total_files - total_moved
 
         return {
             "total_analyzed": result.total_files,
             "total_moved": total_moved,
-            "images_remaining": images_remaining,
+            "files_remaining": files_remaining,
             "folders_created": result.folders_created,
             "moved_by_type": result.moved_files,
         }

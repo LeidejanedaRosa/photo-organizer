@@ -1,0 +1,27 @@
+# Docker ignore file
+.git
+.gitignore
+README.md
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+.coverage
+htmlcov
+coverage.xml
+.mypy_cache
+.DS_Store
+*.log
+
+# Secrets / credenciais
+.env
+.env.*
+*.env
+*.pem
+*.key
+id_rsa
+id_ed25519
+.ssh/
+.gnupg/
